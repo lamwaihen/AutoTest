@@ -8,14 +8,14 @@ Resource          ..\\Keywords.robot
 *** Test Cases ***
 Install
     [Documentation]    testing
-    Install Build    OSbits=32bit
+    Install Build    ${BUILD}    OSbits=64bit
 
 Test
-    Log    ${CurrentLang}
-    Comment    Initialize
+    Log    ${LANG}
+    Click Image    Install option 32bit
     Comment    Run Keyword If    '${ProductSKU}' == 'Ultimate'    Run Keyword    Log    message=Ultimate
     ...    ELSE    Log 'Other'
 
 Uninstall
-    Log     ${SetupDir}
+    Log    ${SetupDir}
     Uninstall Build
