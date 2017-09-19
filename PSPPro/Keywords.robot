@@ -8,7 +8,7 @@ Library           winregistry.robot    # Library to read registry.
 *** Keywords ***
 Install Build
     [Arguments]    ${Build}    ${OSbits}=64bit    ${Lang}=0409    # "64bit", "32bit" or "Both"
-    Comment    Download Build    ${Build}
+    Download Build    ${Build}
     Log    ${DownloadDir}\\${Build}\\Setup.exe
     Launch Application    "${DownloadDir}\\${Build}\\Setup.exe"
     Wait For    Page EULA    120

@@ -6,9 +6,17 @@ Resource          ..\\Keywords.robot
 *** Variables ***
 
 *** Test Cases ***
-Install
+Install32bit
+    [Documentation]    testing
+    Install Build    ${BUILD}    OSbits=32bit
+
+Install64bit
     [Documentation]    testing
     Install Build    ${BUILD}    OSbits=64bit
+
+InstallBoth
+    [Documentation]    testing
+    Install Build    ${BUILD}    OSbits=Both
 
 Test
     Log    ${LANG}

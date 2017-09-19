@@ -1,0 +1,34 @@
+{
+  "CONFIG": [
+	{
+      "CLASS": "PSPX10",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",		  
+          "TESTCASE": "InstallBoth"
+        }
+      ]
+    },
+    {
+      "CLASS": "PSPX10",
+      "CUSTOMER": "PhotoUlt(QA)-Retail(Release)",
+      "OPTIONS": "Main-Branch",
+      "TASK": [
+        {
+          "LCID": "0411",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",
+          "TESTCASE": "Install32bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",		  
+          "TESTCASE": "Install64bit"
+        }
+      ]
+    }
+  ]
+}
