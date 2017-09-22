@@ -1,5 +1,6 @@
 *** Settings ***
 Suite Setup       Initialize
+Suite Teardown    Uninitialize
 Resource          ..\\Resource.robot
 Resource          ..\\Keywords.robot
 
@@ -8,15 +9,15 @@ Resource          ..\\Keywords.robot
 *** Test Cases ***
 Install32bit
     [Documentation]    testing
-    Install Build    ${BUILD}    OSbits=32bit
+    Install Build    ${BUILD}    ${LANG}    OSbits=32bit
 
 Install64bit
     [Documentation]    testing
-    Install Build    ${BUILD}    OSbits=64bit
+    Install Build    ${BUILD}    ${LANG}    OSbits=64bit
 
 InstallBoth
     [Documentation]    testing
-    Install Build    ${BUILD}    OSbits=Both
+    Install Build    ${BUILD}    ${LANG}    OSbits=Both
 
 Test
     Log    ${LANG}

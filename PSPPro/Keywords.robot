@@ -7,46 +7,32 @@ Library           winregistry.robot    # Library to read registry.
 
 *** Keywords ***
 Install Build
-    [Arguments]    ${Build}    ${OSbits}=64bit    ${Lang}=0409    # "64bit", "32bit" or "Both"
+    [Arguments]    ${Build}    ${Lang}=0409    ${OSbits}=64bit    # "64bit", "32bit" or "Both"
+	[Timeout]    20min
     Download Build    ${Build}
     Log    ${DownloadDir}\\${Build}\\Setup.exe
     Launch Application    "${DownloadDir}\\${Build}\\Setup.exe"
     Wait For    Page EULA    120
     Press Combination    Key.Alt    Key.a    # Select 'I accept the terms...'
     Press Combination    Key.Alt    Key.n    # Click 'Next'
-    Wait For    Page User information    60
+    Wait For    Page User information    120
     Press Combination    Key.Alt    Key.s    # Select 'Serial Number'
     Type    ${SerialUltimateRetail}
     Press Combination    Key.Alt    Key.n    # Click 'Next'
-    Wait For    Page Installation options    60
+    Wait For    Page Installation options    120
     Run Keyword If    '${OSbits}' == '64bit'    Click Image    Install Option 64bit
     ...    ELSE IF    '${OSbits}' == '32bit'    Click Image    Install Option 32bit
     ...    ELSE    Click Image    Install Option both
     Press Combination    Key.Alt    Key.n    # Click 'Next'
+	Defocus
     Wait For    Page Features Settings
-    Click Image    Checkbox languages
-    Press Combination    Key.Down    # Click down twice
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Traditional Chinese'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'German'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Spanish'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'French'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Italian'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Japanese'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Dutch'
-    Press Combination    Key.Down
-    Press Combination    Key.Space    # Select 'Russian'
-    Click Image    Page Features settings
+	Click Image    Checkbox languages
+    Run Keyword If    '${Lang}' == '0409'    Select All Languages
+	Click Image    Page Features settings
     Press Combination    Key.Alt    Key.i    # Click 'Install Now'
     Sleep    2m    # Sleep 2m while installing
-    WaitFor    Page completed    600
-    ClickImage    Checkbox check updates
+    Wait For    Page completed    600
+    Click Image    Checkbox check updates
     Press Combination    Key.Alt    Key.f    # Click 'Finish'
     Wait For    PSPX10 Initialization    120
 
@@ -100,3 +86,33 @@ Get System Language
 Initial Launch
     [Arguments]    ${OSbits}=64bit
     [Documentation]    Register and launch application for the first time.
+
+Select All Languages
+    [Documentation]    To select all language options in the tree control when installing English version.
+    Press Combination    Key.Down    # Click down twice
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Traditional Chinese'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'German'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Spanish'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'French'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Italian'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Japanese'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Dutch'
+    Press Combination    Key.Down
+    Press Combination    Key.Space    # Select 'Russian'
+
+Uninitialize
+    Comment    Sleep    60s
+    Comment    Press Combination    Key.Win    Key.r 
+    Comment    Type    shutdown /p /f /t 60
+    Comment    Press Combination    Key.Enter
+
+Defocus
+	Move To    1    1
+	Click

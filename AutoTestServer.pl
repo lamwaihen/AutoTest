@@ -11,8 +11,11 @@ my $_autoTestDir_ = "V:\\autotest";
 my $_fileServerConfig_ = $_autoTestDir_."\\Tools-AutoTest\\Config\\AutoTestServer.json";
 my $_fileClientBatch_ = $_autoTestDir_."\\Tools-AutoTest\\Jobs\\AutoTestClient.bat";
 my @_dataServerConfig_ = ();
+my @_runningMachines_ = ();
+
 my $_loop_ = 1;
-my $_loopInterval_	= 5;	# Loop every 5 sec.
+my $_waitShort_	= 30;	# Shorter wait for loop.
+my $_waitLong_ = 60;	# Longer wait for loop.
 my $_input_ = "";
 
 # Jobs
@@ -37,7 +40,6 @@ sub main()
 	{
 		# Check if new jobs exist
 		@_files_ = glob($_autoTestDir_."\\Tools-AutoTest\\Jobs\\*.py");
-		print scalar @_files_."\n";
 		if (scalar @_files_ > 0)
 		{
 			# Make sure no VM is running
@@ -49,7 +51,6 @@ sub main()
 					&getDateTime("Test begin for $file");
 					# Once we have found new job, parse its content to get matching server config and create tasks
 					my @tasks = &parseJob($file);
-					print CYAN, "\tThere are ". scalar @tasks." tasks for this job.\n", RESET;
 					
 					&createClientBatchScript($file, \@tasks);
 					
@@ -72,13 +73,14 @@ sub main()
 			{
 				&getDateTime("Testing in progress");
 			}
+			close($vmResult);
 		}
 		else
 		{
 			&getDateTime("No jobs available");
 		}
 		
-		sleep($_loopInterval_);
+		sleep($_waitLong_);
 	}
 }
 
@@ -87,6 +89,7 @@ sub main()
 #
 sub collectResults()
 {
+	&getDateTime("collectResults Start");
 	my $logID = shift;
 	my @tasks = @{my $t = shift};
 	
@@ -94,17 +97,24 @@ sub collectResults()
 	my $waitResults = 1;
 	while ($waitResults)
 	{
-		print "Testing...\n";
-		sleep(30);
+		print YELLOW, "  All machines are testing...\n", RESET;
+		sleep($_waitLong_);
 		my @results = glob($_autoTestDir_."\\".$logID."\\*.xml");
 		if (scalar @results == scalar @tasks)
 		{
-			$waitResults = 0;
-			last;
+		
+			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
+			if (eof $vmResult)
+			{
+				$waitResults = 0;				
+			}
+			close($vmResult);			
 		}
 	}
-	
+	print GREEN, "  All testing are completed\n", RESET;
 	system("rebot --name ".$logID." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\".$logID."\\*.xml");
+	print CYAN, "  Test result created \n", RESET;
+	&getDateTime("collectResults End");
 }
 
 #
@@ -112,6 +122,7 @@ sub collectResults()
 #
 sub createClientBatchScript()
 {
+	&getDateTime("createClientBatchScript Start");
 	my $variableFile = shift;
 	my @tasks = @{my $t = shift};
 
@@ -153,19 +164,31 @@ sub createClientBatchScript()
 	}
 	print $fh ":exit\n";
 	print $fh "endlocal\n";
+#	print $fh "shutdown /i\n";
 	close($fh);
+	print CYAN, "  Client batch script created: ", RESET, $_fileClientBatch_."\n";
+	&getDateTime("createClientBatchScript End");
 }
 
 sub dispatchTasks()
 {
+	&getDateTime("dispatchTasks Start");
 	my @tasks = @{my $t = shift};
 	
-	for my $task (@tasks)
+	while(scalar @tasks > 0)
 	{
+		my $task = shift(@tasks);
 		my $machine = "Win10-64-EN";
 		if ($task->{OS} eq "Win10-64")
 		{
-			if ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";}
+			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";}
+			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";}
+			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";}
+			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";}
+			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";}
+			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";}
+			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";}
+			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";}
 		}
 		elsif ($task->{OS} eq "Win7-64")
 		{
@@ -175,10 +198,30 @@ sub dispatchTasks()
 		{
 			
 		}	
+		
+		print YELLOW, "  Selected machine ".$machine." for test case ".$task->{TESTCASE}."\n", RESET;
+		# If machine is not running, start it
+		open(my $vmResult, "powershell Get-VM -VMName ".$machine." \"| Where-Object {\$_.State -eq 'Running'} \" |");
+		if (eof $vmResult)
+		{
+			print GREEN, "  ".$machine." is avabile.\n", RESET;
+			system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -Confirm:\$false");
+			system("powershell Start-VM -VMName ".$machine);
 
-		system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -Confirm:\$false");
-		system("powershell Start-VM -VMName ".$machine);		
+			push(@_runningMachines_, $machine);
+		}
+		else
+		{
+			print RED, "  ".$machine." is working on previous test case...\n", RESET;
+			push(@tasks, $task);
+			
+			sleep($_waitShort_);
+			# Check if any running machines are available.
+		}
+		close($vmResult);
+		print YELLOW, "  There are ".scalar @tasks." tasks still remain.\n", RESET;
 	}
+	&getDateTime("dispatchTasks End")
 }
 
 sub getDateTime()
@@ -191,8 +234,7 @@ sub getDateTime()
 							$hour,
 							$min,
 							$sec );
-	#print BRIGHT_MAGENTA, "  ========== ", BOLD BRIGHT_BLUE, "[$_[0]]: $DateTime", BRIGHT_MAGENTA, " ==========\n", RESET;
-	print "[$DateTime]: $_[0]\n";
+	print BRIGHT_MAGENTA, "  ========== ", BOLD BRIGHT_BLUE, "[$DateTime]: $_[0]\n", RESET;
 }
 
 sub parseConfig()
@@ -222,6 +264,7 @@ sub parseConfig()
 #
 sub parseJob()
 {
+	&getDateTime("parseJob Start");
 	my $file = shift;
 	
 	open(my $fh, '<', $file);
@@ -240,7 +283,7 @@ sub parseJob()
 	my @result = ();
 	for my $config (@_dataServerConfig_) 
 	{		
-		if (defined $config->{CUSTOMER} && $config->{CLASS} eq $_CLASS_)
+		if (defined $config->{CLASS} && $config->{CLASS} eq $_CLASS_)
 		{
 			if (defined $config->{CUSTOMER} && $config->{CUSTOMER} eq $_CUSTOMER_)
 			{			
@@ -263,9 +306,11 @@ sub parseJob()
 		}
 	}
 
+	print CYAN, "\tThere are ". scalar @result." tasks for this job.\n", RESET;
 	for ( @result ) 
 	{
-		print "\t$_->{TESTCASE}\n";
+		print "\t$_->{OS} $_->{LCID} $_->{TESTCASE}\n";
 	}
 	return @result;
+	&getDateTime("parseJob End");
 }
