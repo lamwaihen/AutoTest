@@ -9,7 +9,7 @@ use Term::ANSIColor qw(:constants);
 
 my $_autoTestDir_ = "V:\\autotest";
 my $_fileServerConfig_ = $_autoTestDir_."\\Tools-AutoTest\\Config\\AutoTestServer.json";
-my $_fileClientBatch_ = $_autoTestDir_."\\Tools-AutoTest\\Jobs\\AutoTestClient.bat";
+my $_fileClientBatch_ = $_autoTestDir_."\\Jobs\\AutoTestClient.bat";
 my @_dataServerConfig_ = ();
 my @_runningMachines_ = ();
 
@@ -39,7 +39,7 @@ sub main()
 	while($_loop_)
 	{
 		# Check if new jobs exist
-		@_files_ = glob($_autoTestDir_."\\Tools-AutoTest\\Jobs\\*.py");
+		@_files_ = glob($_autoTestDir_."\\Jobs\\*.py");
 		if (scalar @_files_ > 0)
 		{
 			# Make sure no VM is running
@@ -53,6 +53,8 @@ sub main()
 					my @tasks = &parseJob($file);
 					
 					&createClientBatchScript($file, \@tasks);
+					
+					rmtree($_autoTestDir_."\\".$_LOGID_);
 					
 					# We will start to dispatch by launching VMs.
 					&dispatchTasks(\@tasks);
@@ -279,30 +281,22 @@ sub parseJob()
 		elsif ($_ =~ /ALIAS="(\S+)"/) {	$_ALIAS_ = $1;	}
 	}
 	close($fh);
+	print YELLOW, "CLASS ".$_CLASS_." CUSTOMER ".$_CUSTOMER_." OPTIONS ".$_OPTIONS_."\n", RESET;
 	
 	my @result = ();
 	for my $config (@_dataServerConfig_) 
-	{		
-		if (defined $config->{CLASS} && $config->{CLASS} eq $_CLASS_)
+	{
+		my $class = (defined $config->{CLASS}) ? $config->{CLASS} : "";
+		my $customer = (defined $config->{CUSTOMER}) ? $config->{CUSTOMER} : "";
+		my $options = (defined $config->{OPTIONS}) ? $config->{OPTIONS} : "";
+		
+		#print YELLOW, "class ".$class." customer ".$customer." options ".$options."\n", RESET;
+		# Pick the best match.
+		if (($class eq $_CLASS_ && $customer eq "" && $options eq "") ||
+			($class eq $_CLASS_ && $customer eq $_CUSTOMER_ && $options eq "") ||
+			($class eq $_CLASS_ && $customer eq $_CUSTOMER_ && $options eq $_OPTIONS_))
 		{
-			if (defined $config->{CUSTOMER} && $config->{CUSTOMER} eq $_CUSTOMER_)
-			{			
-				if (defined $config->{OPTIONS} && $config->{OPTIONS} eq $_OPTIONS_)
-				{	
-					@result = @{$config->{TASK}};
-					last;
-				}				
-				else
-				{
-					# select the first available
-					@result = @{$config->{TASK}};
-				}
-			}
-			else
-			{
-				# select the first available
-				@result = @{$config->{TASK}};
-			}
+			@result = @{$config->{TASK}};
 		}
 	}
 
