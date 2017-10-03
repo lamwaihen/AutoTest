@@ -52,6 +52,8 @@ sub main()
 					# Once we have found new job, parse its content to get matching server config and create tasks
 					my @tasks = &parseJob($file);
 					
+					(scalar @tasks == 0) and next;
+					
 					&createClientBatchScript($file, \@tasks);
 					
 					rmtree($_autoTestDir_."\\".$_LOGID_);
@@ -66,7 +68,7 @@ sub main()
 					system("powershell Stop-VM -VMName Win*");
 					
 					# Remove the job.
-#					system("rename $file test.xxx");
+					system("rename ".$file." ".$_LOGID_.".xxx");
 				}
 				
 				$_loop_ = 0;
@@ -99,7 +101,7 @@ sub collectResults()
 	my $waitResults = 1;
 	while ($waitResults)
 	{
-		print YELLOW, "  All machines are testing...\n", RESET;
+		print YELLOW, "  All machines are testing for ".$logID."...\n", RESET;
 		sleep($_waitLong_);
 		my @results = glob($_autoTestDir_."\\".$logID."\\*.xml");
 		if (scalar @results == scalar @tasks)
@@ -206,7 +208,7 @@ sub dispatchTasks()
 		open(my $vmResult, "powershell Get-VM -VMName ".$machine." \"| Where-Object {\$_.State -eq 'Running'} \" |");
 		if (eof $vmResult)
 		{
-			print GREEN, "  ".$machine." is avabile.\n", RESET;
+			print GREEN, "  ".$machine." is available.\n", RESET;
 			system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -Confirm:\$false");
 			system("powershell Start-VM -VMName ".$machine);
 
@@ -281,20 +283,20 @@ sub parseJob()
 		elsif ($_ =~ /ALIAS="(\S+)"/) {	$_ALIAS_ = $1;	}
 	}
 	close($fh);
-	print YELLOW, "CLASS ".$_CLASS_." CUSTOMER ".$_CUSTOMER_." OPTIONS ".$_OPTIONS_."\n", RESET;
+	print YELLOW, "  CLASS ", RESET, $_CLASS_, YELLOW, " CUSTOMER ", RESET, $_CUSTOMER_, YELLOW, " OPTIONS ", RESET, $_OPTIONS_."\n", RESET;
 	
 	my @result = ();
 	for my $config (@_dataServerConfig_) 
 	{
 		my $class = (defined $config->{CLASS}) ? $config->{CLASS} : "";
-		my $customer = (defined $config->{CUSTOMER}) ? $config->{CUSTOMER} : "";
+		my $customer = (defined $config->{CUSTOMER}) ? lc($config->{CUSTOMER}) : "";
 		my $options = (defined $config->{OPTIONS}) ? $config->{OPTIONS} : "";
 		
 		#print YELLOW, "class ".$class." customer ".$customer." options ".$options."\n", RESET;
 		# Pick the best match.
 		if (($class eq $_CLASS_ && $customer eq "" && $options eq "") ||
-			($class eq $_CLASS_ && $customer eq $_CUSTOMER_ && $options eq "") ||
-			($class eq $_CLASS_ && $customer eq $_CUSTOMER_ && $options eq $_OPTIONS_))
+			($class eq $_CLASS_ && $customer eq lc($_CUSTOMER_) && $options eq "") ||
+			($class eq $_CLASS_ && $customer eq lc($_CUSTOMER_) && $options eq $_OPTIONS_))
 		{
 			@result = @{$config->{TASK}};
 		}

@@ -1,3 +1,5 @@
-PSPPro/Output
-PSPPro/Temp
+**/Output
+**/Temp
+**/Thumbs.db
+
 Jobs
