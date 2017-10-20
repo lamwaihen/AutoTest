@@ -20,10 +20,8 @@ InstallBoth
     Install Build    ${BUILD}    ${LANG}    OSbits=Both
 
 Test
-    Log    ${LANG}
-    Click Image    Install option 32bit
-    Comment    Run Keyword If    '${ProductSKU}' == 'Ultimate'    Run Keyword    Log    message=Ultimate
-    ...    ELSE    Log 'Other'
+    ${Serial} =    Get From Dictionary    ${SerialNumbers}    BasicTBYB
+    Log    ${Serial}
 
 Uninstall
     Log    ${SetupDir}

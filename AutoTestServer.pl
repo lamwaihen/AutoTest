@@ -289,14 +289,14 @@ sub parseJob()
 	for my $config (@_dataServerConfig_) 
 	{
 		my $class = (defined $config->{CLASS}) ? $config->{CLASS} : "";
-		my $customer = (defined $config->{CUSTOMER}) ? lc($config->{CUSTOMER}) : "";
+		my $customer = (defined $config->{CUSTOMER}) ? uc($config->{CUSTOMER}) : "";
 		my $options = (defined $config->{OPTIONS}) ? $config->{OPTIONS} : "";
 		
 		#print YELLOW, "class ".$class." customer ".$customer." options ".$options."\n", RESET;
 		# Pick the best match.
 		if (($class eq $_CLASS_ && $customer eq "" && $options eq "") ||
-			($class eq $_CLASS_ && $customer eq lc($_CUSTOMER_) && $options eq "") ||
-			($class eq $_CLASS_ && $customer eq lc($_CUSTOMER_) && $options eq $_OPTIONS_))
+			($class eq $_CLASS_ && $customer eq uc($_CUSTOMER_) && $options eq "") ||
+			($class eq $_CLASS_ && $customer eq uc($_CUSTOMER_) && $options eq $_OPTIONS_))
 		{
 			@result = @{$config->{TASK}};
 		}

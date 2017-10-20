@@ -1,6 +1,8 @@
 *** Settings ***
 Resource          Resource.robot
 Library           OperatingSystem
+Library           Collections
+Library           String
 Library           winregistry.robot    # Library to read registry.
 Library           ImageHorizonLibrary    screenshot_folder=output    keyword_on_failure=Fail and Wait
 
@@ -41,13 +43,13 @@ Initialize
     ...    ${ALIAS}
     ${LANG}    Get System Language
     Set Suite Variable    ${LANG}
-    ImageHorizonLibrary.SetReferenceFolder    ${CURDIR}\\Images\\${LANG}
+    ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${LANG}
     ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\${LOGID}
     ${BUILD}    Set Variable    ${OPTIONS}_${VERSION}${VERSIONEXTENSION}_${CUSTOMER}_LOGID${LOGID}
     Set Suite Variable    ${BUILD}
     ${SetupDir}    Get Setup Directory    ${CLASS}    OSbits=32bit
     Set Suite Variable    ${SetupDir}
-	Hide Cmd
+    Hide Cmd	
 
 Remove Downloaded Build
     [Arguments]    ${Build}    # Build package name.
@@ -67,18 +69,17 @@ Uninstall Build
 Fail and Wait
     [Documentation]    When failure, take a screenshot, wait 2 minutes then take another screenshot. This will help to check if application run too slow.
     Take A Screenshot
-    Sleep    2m
+    Sleep    1m
     Take A Screenshot
 	
 Hide Cmd
-    ${cmd} =    Wait For    Icon Command Prompt
-	Move To    ${cmd}
-	Click    right
-	Press Combination    Key.Down
-	Press Combination    Key.Down
-	Press Combination    Key.Down
-	Press Combination    Key.Down
-	Press Combination    Key.Enter
+    [Documentation]    Try to hide the command prompt window to avoid overlapping other dialogs.	
+	:FOR    ${INDEX}    IN RANGE    0    10
+	\    Click Image    Icon Command Prompt
+	\    Sleep    2s	
+	\    ${status}    Run Keyword And Return Status    Wait For    Command Prompt Context    30
+	\    Run Keyword If    '${status}' == 'True'    Exit For Loop	
+	Click Image    Command Prompt Context
 
 Get Application Directory
     [Arguments]    ${Class}    ${OSbits}
@@ -104,38 +105,109 @@ Get Setup Directory
     [Return]    ${Dir}
 
 Get Setup Exe
-    ${Path} =    Set Variable If    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-TWx64)'    '${DownloadDir}\\${Build}\\psp2018_tw_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-TWx86)'    '${DownloadDir}\\${Build}\\psp2018_tw_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-DEx64)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_de_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-DEx86)'    '${DownloadDir}\\${Build}\\psp2018_de_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ESx64)'    '${DownloadDir}\\${Build}\\psp2018_es_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ESx86)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_es_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-FRx64)'    '${DownloadDir}\\${Build}\\psp2018_fr_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-FRx86)'    '${DownloadDir}\\${Build}\\psp2018_fr_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ITx64)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_it_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ITx86)'    '${DownloadDir}\\${Build}\\psp2018_it_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-JPx64)'    '${DownloadDir}\\${Build}\\psp2018_jp_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-JPx86)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_jp_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-NLx64)'    '${DownloadDir}\\${Build}\\psp2018_nl_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-NLx86)'    '${DownloadDir}\\${Build}\\psp2018_nl_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-RUx64)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_ru_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-RUx86)'    '${DownloadDir}\\${Build}\\psp2018_ru_32\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ENx64)'    '${DownloadDir}\\${Build}\\psp2018_en_64\\Setup.exe'    '${CUSTOMER}' == 'PhotoPro(QA)-TBYB(Release-30Day-ENx86)'
-    ...    '${DownloadDir}\\${Build}\\psp2018_en_32\\Setup.exe'    '${DownloadDir}\\${Build}\\Setup.exe'
+    ${Path} =    Set Variable If
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-PF(RELEASE)'    '${DownloadDir}\\${Build}\\PSP2018_PF.exe'    
+	...    '${CUSTOMER}' == 'PHOTOULT(QA)-PF(RELEASE)'    '${DownloadDir}\\${Build}\\PSP2018_Ultimate_PF.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY)'    '${DownloadDir}\\${Build}\\PSP2018_TBYB30.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-SOFTBANK)'    '${DownloadDir}\\${Build}\\PSP2018_TBYB30_SoftBank.exe'    
+    ...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-TWX64)'    '${DownloadDir}\\${Build}\\psp2018_tw_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-TWX86)'    '${DownloadDir}\\${Build}\\psp2018_tw_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-DEx64)'    '${DownloadDir}\\${Build}\\psp2018_de_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-DEX86)'    '${DownloadDir}\\${Build}\\psp2018_de_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ESX64)'    '${DownloadDir}\\${Build}\\psp2018_es_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ESX86)'    '${DownloadDir}\\${Build}\\psp2018_es_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-FRX64)'    '${DownloadDir}\\${Build}\\psp2018_fr_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-FRX86)'    '${DownloadDir}\\${Build}\\psp2018_fr_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ITX64)'    '${DownloadDir}\\${Build}\\psp2018_it_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ITX86)'    '${DownloadDir}\\${Build}\\psp2018_it_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-JPX64)'    '${DownloadDir}\\${Build}\\psp2018_jp_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-JPX86)'    '${DownloadDir}\\${Build}\\psp2018_jp_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-NLX64)'    '${DownloadDir}\\${Build}\\psp2018_nl_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-NLX86)'    '${DownloadDir}\\${Build}\\psp2018_nl_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-RUX64)'    '${DownloadDir}\\${Build}\\psp2018_ru_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-RUX86)'    '${DownloadDir}\\${Build}\\psp2018_ru_32\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ENX64)'    '${DownloadDir}\\${Build}\\psp2018_en_64\\Setup.exe'    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ENX86)'    '${DownloadDir}\\${Build}\\psp2018_en_32\\Setup.exe'  
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-ROYALTYFREE(RELEASE)'    '${DownloadDir}\\${Build}\\Corel_PSP2018RF.exe'
+	...    '${DownloadDir}\\${Build}\\Setup.exe'
     [Return]    ${Path}
+
+Get Serial Number
+    ${Type} =    Set Variable If    
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-RETAIL(RELEASE)'    ProRetail
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-PF(RELEASE)'    ProRetail
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-ROYALTYFREE(RELEASE)'    ProRetail
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-SOFTBANK)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-SOFTBANK-X64)'    ProTBYB
+    ...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-TWX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-TWX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-DEX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-DEX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ESX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ESX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-FRX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-FRX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ITX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ITX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-JPX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-JPX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-NLX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-NLX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-RUX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-RUX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ENX64)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOPRO(QA)-TBYB(RELEASE-30DAY-ENX86)'    ProTBYB
+	...    '${CUSTOMER}' == 'PHOTOBASIC(QA)-RETAIL(RELEASE)'    BasicRetail
+	...    '${CUSTOMER}' == 'PHOTOBASIC(QA)-TBYB(RELEASE-30DAY)'    BasicTBYB
+	...    '${CUSTOMER}' == 'PHOTOULT(QA)-RETAIL(RELEASE)'    UltimateRetail
+	...    '${CUSTOMER}' == 'PHOTOULT(QA)-PF(RELEASE)'    UltimateRetail
+	...    '${CUSTOMER}' == 'PHOTOULT(QA)-PF(RELEASE-SOFTBANK)'    UltimateRetail
+	...    Fail    Unknown CUSTOMER
+	${Serial} =    Get From Dictionary    ${SerialNumbers}    ${Type}
+    [Return]    ${Serial}
 
 Get System Language
     # Get the current language from registry
     &{lang}    Read Registry Value    HKLM\\SYSTEM\\CurrentControlSet\\Control\\Nls\\Language    InstallLanguage
     ${sysLang}    Set Variable    &{lang}[data]
     [Return]    ${sysLang}
-
+	
+Launch Onscreen Keyboard
+    [Documentation]    Run osk.exe and manually move it to bottom of screen.
+	Run Keyword If    '${Lang}' != '0411'    Return from Keyword
+	Press Combination    Key.Win    Key.R
+	Type    osk.exe
+	Press Combination    Key.Enter
+	Wait For    Icon Onscreen Keyboard    240
+	Click Image    Icon Onscreen Keyboard
+	Press Combination    Key.Alt    Key.Space    Key.M
+	:FOR    ${INDEX}    IN RANGE    0    50
+	\    Press Combination    Key.Down
+	Press Combination    Key.Enter
+	
 Process Dialog Register
     Wait For    Dialog Register    480
-    Press Combination    Key.Alt    Key.e
-    Type    ${Email}
+	Launch Onscreen Keyboard
+	Click Image    Dialog Register
+	Press Combination    Key.Alt    Key.E
+	Type Onscreen Keyboard    ${Email}
     Click Image    Button Register
     Wait For    Dialog Registration Completed    240
     Click Image    Button Continue
 
 Process Page User Information
-    Run Keyword If    '${ALIAS}' == 'Ultimate'    Run Keywords    Wait For    Page User information    240
+    ${Serial} =    Get Serial Number
+    Run Keyword If    '${Serial}' != ''    Run Keywords    Wait For    Page User information    240
     ...    AND    Press Combination    Key.Alt    Key.s
-    ...    AND    Type    ${SerialUltimateRetail}
+    ...    AND    Type    ${Serial}
     ...    AND    Press Combination    Key.Alt    Key.n    # Select 'Serial Number'    # Click 'Next'
 
 Process Page Installation Options
-    [Arguments]    ${OSbits}
-    Run Keyword If    '${ALIAS}' == 'Ultimate'    Run Keywords    Wait For    Page Installation options    240
+    [Arguments]    ${OSbits}	
+	${is32or64} =    Run Keyword And Ignore Error    Should Contain Any    ${CUSTOMER}    X86    X64
+	Run Keyword If    ${is32or64} != ('PASS', None)
+    ...    Run Keywords    Wait For    Page Installation options    240
     ...    AND    Select Install Options    ${OSbits}
     ...    AND    Take A Screenshot
     ...    AND    Press Combination    Key.Alt    Key.n    # Click 'Next'
@@ -144,7 +216,7 @@ Process Page Features Settings
     [Arguments]    ${Lang}
     Wait For    Page Features Settings    240
     Defocus
-    Run Keyword If    '${ALIAS}' == 'Ultimate'    Run Keywords    Click Image    Checkbox languages
+    Run Keyword If    '${ALIAS}' != 'TBYB-Breakdown' and '${ALIAS}' != 'SoftBank'    Run Keywords    Click Image    Checkbox languages
     ...    AND    Run Keyword If    '${Lang}' == '0409'    Select All Languages
     Click Image    Page Features Settings
     Press Combination    Key.Alt    Key.i    # Click 'Install Now'
@@ -190,7 +262,8 @@ Process Guided Tour
 Initial Launch
     [Arguments]    ${Class}    ${OSbits}=64bit
     [Documentation]    Register and launch application for the first time.
-    ${bits} =    Set Variable If    '${ALIAS}' == 'TBYB-Breakdown'    64bit    ${OSbits}
+	${is32bits} =    Run Keyword And Ignore Error    Should Contain    ${CUSTOMER}    X86
+    ${bits} =    Set Variable If    ${is32bits} == ('PASS', None)    32bit    ${OSbits}
     ${Exe}    Get Application Exe    ${Class}    ${bits}
     Launch Application    '${Exe}'
     Process Dialog Register
@@ -252,6 +325,33 @@ Switch Mode
 
 Switch Workspace
     [Arguments]    ${Workspace}
+	
+Type Onscreen Keyboard
+    [Documentation]    Helper function to type onscreen keyboard in Japanese OS, close after completed.
+    [Arguments]    ${Input}
+	Run Keyword If    '${Lang}' != '0411'    Run Keywords    Type    ${Input}
+	...    AND    Return from Keyword
+	${length} =    Get Length    ${Input}
+	@{characters} =	   Split String To Characters    ${Input}
+	:FOR    ${char}    IN     @{characters}
+    \    Run Keyword If    '${char}' == 'a'    Click Image    OSK a
+	\    ...    ELSE IF    '${char}' == 'b'    Click Image    OSK b
+	\    ...    ELSE IF    '${char}' == 'c'    Click Image    OSK c
+	\    ...    ELSE IF    '${char}' == 'd'    Click Image    OSK d
+	\    ...    ELSE IF    '${char}' == 'e'    Click Image    OSK e
+	\    ...    ELSE IF    '${char}' == 'i'    Click Image    OSK i
+	\    ...    ELSE IF    '${char}' == 'l'    Click Image    OSK l
+	\    ...    ELSE IF    '${char}' == 'm'    Click Image    OSK m
+	\    ...    ELSE IF    '${char}' == 'o'    Click Image    OSK o
+	\    ...    ELSE IF    '${char}' == 'r'    Click Image    OSK r
+	\    ...    ELSE IF    '${char}' == 's'    Click Image    OSK s
+	\    ...    ELSE IF    '${char}' == 'u'    Click Image    OSK u
+	\    ...    ELSE IF    '${char}' == '@'    Click Image    OSK at
+	\    ...    ELSE IF    '${char}' == '.'    Click Image    OSK dot
+	Click Image    Icon Onscreen Keyboard
+	:FOR    ${INDEX}    IN RANGE    0    6
+	\    Press Combination    Key.Down
+	Press Combination    Key.Enter
 
 Uninitialize
     Comment    Sleep    60s
@@ -260,5 +360,6 @@ Uninitialize
     Comment    Press Combination    Key.Enter
 
 Defocus
+    [Documentation]    Click somewhere outside the dialog to defocus.
     Move To    1    1
     Click

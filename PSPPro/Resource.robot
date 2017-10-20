@@ -7,7 +7,12 @@ Documentation     A resouce file with reusable keywords and variables.
 ${DownloadDir}    C:\\users\\ivibuild\\Downloads
 ${SerialUltimateRetail}    TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
 ${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
-&{SerialNumbers}    ProRetail=123    UltimateRetail=456    Retail=789
+&{SerialNumbers}    ProRetail=TS20R22-4EQLFW7-QNC5EVN-HTM2UW6
+    ...    ProTBYB=
+	...    ProVLP=TS20C22-A7X3V43-DAMUHWT-ZWZ9RSQ
+	...    BasicRetail=TB20R22-NBTK8WM-NJLVNZH-8DVAJRU
+	...    BasicTBYB=TB20T22-4MUX7PW-B3BGDBJ-XYMEQM2
+    ...    UltimateRetail=TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
 ${Email}          buildrelease@corel.com
 ${en-US}          0409
 ${zh-TW}          0404
@@ -28,5 +33,3 @@ ${VERSIONEXTENSION}    \    # Arguments from BM2, e.g. "b"
 ${ALIAS}          \    # Arguments from BM2, e.g. "Ultimate"
 ${VERSION}        \    # Arguments from BM2, e.g. "20.0.0.132"
 ${BUILD}          \    # Build package name like "Main-Branch_20.0.0.132_PhotoUlt(QA)-Retail(Release)_LOGID563524"
-
-*** Keywords ***

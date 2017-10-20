@@ -2,12 +2,13 @@
   "CONFIG": [
 	{
       "CLASS": "PSPX10",
+	  "CUSTOMER": "PHOTOPRO(QA)-TBYB(RELEASE-30DAY-JPX86)",
       "TASK": [
         {
-          "LCID": "0409",
+          "LCID": "0411",
           "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",		  
-          "TESTCASE": "InstallBoth"
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch32bit"
         }
       ]
     },
@@ -17,16 +18,28 @@
       "OPTIONS": "Main-Branch",
       "TASK": [
         {
-          "LCID": "0411",
+          "LCID": "0409",
           "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",
-          "TESTCASE": "Install32bit"
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",
+          "TESTCASE": "FirstLaunch32bit"
         },
         {
           "LCID": "0409",
           "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\Installation.robot",		  
-          "TESTCASE": "Install64bit"
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch32bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
         }
       ]
     }
