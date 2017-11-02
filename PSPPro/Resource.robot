@@ -4,8 +4,7 @@ Documentation     A resouce file with reusable keywords and variables.
 ...               Use ImageHorizonLibrary for image recognized automation.
 
 *** Variables ***
-${DownloadDir}    C:\\users\\ivibuild\\Downloads
-${SerialUltimateRetail}    TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
+${DownloadDir}    C:\\Users\\ivibuild\\Downloads
 ${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
 &{SerialNumbers}    ProRetail=TS20R22-4EQLFW7-QNC5EVN-HTM2UW6
     ...    ProTBYB=
@@ -14,6 +13,7 @@ ${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
 	...    BasicTBYB=TB20T22-4MUX7PW-B3BGDBJ-XYMEQM2
     ...    UltimateRetail=TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
 ${Email}          buildrelease@corel.com
+@{Languages} =    0404    0407    0409    0C0A    040C    0410    0411    0413    0419
 ${en-US}          0409
 ${zh-TW}          0404
 ${de-DE}          0407
@@ -23,7 +23,7 @@ ${it-IT}          0410
 ${ja-JP}          0411
 ${nl-NL}          0413
 ${ru-RU}          0419
-${LANG}           en-US    # The language subfolder we store images for recognize
+${LANG}           0409    #The language subfolder we store images for recognize
 ${SetupDir}       ${EMPTY}
 ${LOGID}          \    # Arguments from BM2.
 ${CLASS}          \    # Arguments from BM2.

@@ -225,15 +225,15 @@ Process Guided Tour
     [Arguments]    ${Mode}    ${Theme}
     Switch Mode    ${Mode}    ${Theme}
     Run Keyword If    '${Mode}' == 'Edit' and '${Theme}' == 'Light'    Run Keywords    Wait For    Guided Tour Edit Light 1    240
-    ...    AND    Click Image    Guided Tour Button Next Light
+    ...    AND    Click To The Right Of Image    Guided Tour Edit Light 1    215
     ...    AND    Wait For    Guided Tour Edit Light 2    240
-    ...    AND    Click Image    Guided Tour Button Next Light
+    ...    AND    Click To The Right Of Image    Guided Tour Edit Light 2    215
     ...    AND    Wait For    Guided Tour Edit Light 3    240
-    ...    AND    Click Image    Guided Tour Button Next Light
+    ...    AND    Click To The Right Of Image    Guided Tour Edit Light 3    215
     ...    AND    Wait For    Guided Tour Edit Light 4    240
-    ...    AND    Click Image    Guided Tour Button Next Light
+    ...    AND    Click To The Right Of Image    Guided Tour Edit Light 4    215
     ...    AND    Wait For    Guided Tour Edit Light 5    240
-    ...    AND    Click Image    Guided Tour Button Finish Light
+    ...    AND    Click To The Right Of Image    Guided Tour Edit Light 5    215
     ...    ELSE IF    '${Mode}' == 'Edit' and '${Theme}' == 'Dark'    Run Keywords    Wait For    Guided Tour Edit Dark 1    240
     ...    AND    Click Image    Guided Tour Button Next Dark
     ...    AND    Wait For    Guided Tour Edit Dark 2    240
@@ -267,8 +267,8 @@ Initial Launch
     ${Exe}    Get Application Exe    ${Class}    ${bits}
     Launch Application    '${Exe}'
     Process Dialog Register
-    Wait For    Splash Screen    240
-    Wait For    Welcome Essentials Light    240
+    Wait For    Splash Screen    480
+    Wait For    Welcome Essentials Light    600
     Process Guided Tour    Edit    Light
     Click Image    Mode Button Home Light
     Wait For    Welcome Essentials Light    240
@@ -283,6 +283,15 @@ Initial Launch
     Wait For    Welcome Essentials Dark    240
     Click Image    Radio Workspaces Essentials
     Wait For    Welcome Essentials Light    240
+	Run Keyword If    '${Lang}' == '0409'    Run Keywords    Switch Language    ${Exe}    0404
+	...    AND    Switch Language    ${Exe}    0C0A
+	...    AND    Switch Language    ${Exe}    040C
+	...    AND    Switch Language    ${Exe}    0404
+	...    AND    Switch Language    ${Exe}    0407
+	...    AND    Switch Language    ${Exe}    0410
+	...    AND    Switch Language    ${Exe}    0411
+	...    AND    Switch Language    ${Exe}    0413
+	...    AND    Switch Language    ${Exe}    0419
 
 Select All Languages
     [Documentation]    To select all language options in the tree control when installing English version.
@@ -309,10 +318,105 @@ Select Install Options
     Run Keyword If    '${OSbits}' == '64bit'    Click Image    Install Option 64bit
     ...    ELSE IF    '${OSbits}' == '32bit'    Click Image    Install Option 32bit
     ...    ELSE    Click Image    Install Option both
+	
+Select Switch Language
+    [Arguments]    ${FromLang}    ${ToLang}
+	${from} =    Get Index From List    ${Languages}    ${FromLang}
+	${to} =    Get Index From List    ${Languages}    ${ToLang}
+	${moves} =    Evaluate    ${to} - ${from}
+	${step} =    Set Variable If    ${moves} < 0    -1
+	...    ${moves} >= 0    1
+	:FOR    ${INDEX}    IN RANGE    0    ${moves}    ${step}
+	\    Run Keyword If    ${step} == 1    Press Combination    Key.Down
+	\    ...    ELSE    Press Combination    Key.Up
+	Press Combination    Key.Enter
+	Wait For    Dialog Switch Language Restart    240
+	Press Combination    Key.Enter	
+	
+Set System Fonts
+    [Arguments]    ${Lang}
+	${regFontSubstitutes} =    Set Variable    HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\FontSubstitutes
+	${regSystemLink} =    Set Variable    HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink
+	@{twSysLinkSegoeUI} =    Create List
+	...    TAHOMA.TTF,Tahoma
+    ...    MSJH.TTC,Microsoft Jhenghei UI,128,96
+    ...    MSJH.TTC,Microsoft Jhenghei UI
+    ...    MSYH.TTC,Microsoft YaHei UI,128,96
+    ...    MSYH.TTC,Microsoft YaHei UI
+    ...    MEIRYO.TTC,Meiryo UI,128,96
+    ...    MEIRYO.TTC,Meiryo UI
+    ...    MINGLIU.TTC,PMingLiU
+    ...    SIMSUN.TTC,SimSun
+    ...    MSGOTHIC.TTC,MS UI Gothic
+    ...    MALGUN.TTF,Malgun Gothic,128,96
+    ...    MALGUN.TTF,Malgun Gothic
+    ...    GULIM.TTC,Gulim
+    ...    YUGOTHM.TTC,Yu Gothic UI,128,96
+    ...    YUGOTHM.TTC,Yu Gothic UI
+    ...    SEGUISYM.TTF,Segoe UI Symbol
+	@{enSysLinkSegoeUI} =    Create List
+	...    TAHOMA.TTF,Tahoma
+	...    MEIRYO.TTC,Meiryo UI,128,96
+	...    MEIRYO.TTC,Meiryo UI
+	...    MSGOTHIC.TTC,MS UI Gothic
+	...    MSJH.TTC,Microsoft JhengHei UI,128,96
+	...    MSJH.TTC,Microsoft JhengHei UI
+	...    MSYH.TTC,Microsoft YaHei UI,128,96
+	...    MSYH.TTC,Microsoft YaHei UI
+	...    MALGUN.TTF,Malgun Gothic,128,96
+	...    MALGUN.TTF,Malgun Gothic
+	...    MINGLIU.TTC,PMingLiU
+	...    SIMSUN.TTC,SimSun
+	...    GULIM.TTC,Gulim
+	...    YUGOTHM.TTC,Yu Gothic UI,128,96
+	...    YUGOTHM.TTC,Yu Gothic UI
+	Run Keyword If    '${LANG}' == '0404'    Write Registry Value    ${regSystemLink}    Segoe UI    ${twSysLinkSegoeUI}    REG_MULTI_SZ
+	...    ELSE    Run Keyword And Ignore Error    Write Registry Value    ${regSystemLink}    Segoe UI    ${enSysLinkSegoeUI}    REG_MULTI_SZ
 
+Set System Language Preferences
+	[Documentation]    Open Control Panel/Language window to adjust other, which display Japanese correctly on English system
+	Press Combination    Key.Win    Key.R
+	Type    control /name Microsoft.Language
+	Press Combination    Key.Enter
+	Sleep    5s
+	Click Image    Button UILanguage
+	:FOR    ${INDEX}    IN RANGE    0    8
+	\    Run Keyword And Ignore Error    Click Image    Button MoveUp
+	\    Sleep    2s
+	\    Click Image    Button UILanguage
+	\    ${canMoveUp} =    Run Keyword And Ignore Error    Does Exist    Button MoveUp
+	\    Run Keyword If    ${canMoveUp} != ('PASS', True)    Exit For Loop	
+    Press Combination    Key.Alt    Key.F4	
+	
 Switch Language
-    [Arguments]    ${From}    ${To}
+    [Arguments]    ${Exe}    ${To}
     [Documentation]    Switch application GUI language
+	Sleep    10s
+	Click To The Below Of Image    Icon Light    32
+	Press Combination    Key.Up
+	Press Combination    Key.Up
+	Press Combination    Key.Right
+	Press Combination    Key.Up
+	Press Combination    Key.Enter
+	Wait For    Dialog Switch Language    240
+	Select Switch Language    ${LANG}    ${To}
+	Click To The Below Of Image    Icon Light    32
+	Press Combination    Key.Up
+	Press Combination    Key.Enter
+	Sleep    10s
+	${hasUpdatePrompt} =    Run Keyword And Ignore Error    Does Exist    Dialog Update Prompt
+    Run Keyword If    ${hasUpdatePrompt} == ('PASS', True)    Press Combination    Key.Alt    Key.F4
+	Sleep    30s	
+	Set Suite Variable    ${LANG}    ${To}
+    ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${LANG}
+	Set System Language Preferences
+	Set System Fonts    ${LANG}
+	Launch Application    '${Exe}'
+    Wait For    Splash Screen    480
+    Wait For    Welcome Essentials Light    600
+	Take A Screenshot
+	Process Guided Tour    Edit    Light
+    Click Image    Mode Button Home Light
 
 Switch Mode
     [Arguments]    ${Mode}    ${Theme}
@@ -361,5 +465,5 @@ Uninitialize
 
 Defocus
     [Documentation]    Click somewhere outside the dialog to defocus.
-    Move To    1    1
+    Move To    960    1
     Click
