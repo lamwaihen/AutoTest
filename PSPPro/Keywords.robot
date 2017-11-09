@@ -25,9 +25,9 @@ Install Build
     Wait For    Page completed    600
     Click Image    Checkbox check updates
     Press Combination    Key.Alt    Key.f    # Click 'Finish'
-    Wait For    PSPX10 Initialization    240
+    Comment    Wait For    PSPX10 Initialization    240
     Sleep    1m
-    Wait For    Web Thank You for Installing    240
+    Wait For    Web Thank You for Installing    480
     Click Image    Web Thank You for Installing
     Press Combination    Key.Alt    Key.F4    # Close browser
 	Sleep    30s
@@ -193,7 +193,9 @@ Process Dialog Register
 	Press Combination    Key.Alt    Key.E
 	Type Onscreen Keyboard    ${Email}
     Click Image    Button Register
-    Wait For    Dialog Registration Completed    240
+	Sleep    30s
+    Wait For    Button Continue    240
+	Take A Screenshot
     Click Image    Button Continue
 
 Process Page User Information
