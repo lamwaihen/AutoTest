@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use File::Path;
+use File::stat qw(stat);
 #use File::Copy::Recursive qw(rcopy);
 use JSON qw();
 use Term::ANSIColor qw(:constants);
@@ -16,10 +17,13 @@ my @_runningMachines_ = ();
 my $_loop_ = 1;
 my $_waitShort_	= 30;	# Shorter wait for loop.
 my $_waitLong_ = 60;	# Longer wait for loop.
+my $_vmPerServer_ = 1;	# Number of VMs we can launch from server at the same time.
 my $_input_ = "";
+my $_date_ = "";
 
 # Jobs
 my $_LOGID_ = "";			# e.g. "563524"
+my $_STUB_ = "";			# e.g. "PSP2018_Pro"
 my $_CLASS_ = "";			# e.g. "PSPX10"
 my $_OPTIONS_ = "";			# e.g. "Main-Branch"
 my $_CUSTOMER_ = "";		# e.g. "PhotoUlt(QA)-Retail(Release)"
@@ -32,6 +36,8 @@ exit(0);
 
 sub main()
 {
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+	$_date_ = sprintf("%04d-%02d-%02d", $year + 1900, $mon + 1, $mday);
 	# Parse the server config file before we start
 	&parseConfig();
 
@@ -39,13 +45,14 @@ sub main()
 	while($_loop_)
 	{
 		# Check if new jobs exist
-		@_files_ = glob($_autoTestDir_."\\Jobs\\*.py");
+		@_files_ = glob($_autoTestDir_."\\Jobs\\563524.py");
 		if (scalar @_files_ > 0)
 		{
 			# Make sure no VM is running
 			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
 			if (eof $vmResult)
 			{
+				my @stubTasks;
 				foreach my $file (@_files_) 
 				{			
 					&getDateTime("Test begin for $file");
@@ -55,20 +62,44 @@ sub main()
 					(scalar @tasks == 0) and next;
 					
 					&createClientBatchScript($file, \@tasks);
-					
-					rmtree($_autoTestDir_."\\".$_LOGID_);
+
+					if ($_LOGID_ ne "")
+					{
+						rmtree($_autoTestDir_."\\".$_LOGID_);
+					}
 					
 					# We will start to dispatch by launching VMs.
 					&dispatchTasks(\@tasks);
 					
 					# Now we have to collect the results
-					&collectResults($_LOGID_, \@tasks);
+					if ($_LOGID_ ne "")
+					{
+						&collectResults($_LOGID_, \@tasks);
+					}
+					elsif ($_STUB_ ne "")
+					{
+						push(@stubTasks, @tasks);
+						&waitResults("PSPX10_StubInstaller\\".$_date_, \@tasks, $_STUB_);						
+					}
 					
 					# Shutdown the VMs.
-					system("powershell Stop-VM -VMName Win*");
+					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ARIS-CHEN -TurnOff");
+					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ARIS-CHEN-7 -TurnOff");
 					
 					# Remove the job.
-					system("rename ".$file." ".$_LOGID_.".xxx");
+					if ($_LOGID_ ne "")
+					{
+						system("rename ".$file." ".$_LOGID_.".xxx");
+					}
+					elsif ($_STUB_ ne "")
+					{
+						system("rename ".$file." ".$_STUB_.".xxx");
+					}
+				}
+				
+				if (scalar @stubTasks > 0)
+				{
+					&collectResults("PSPX10_StubInstaller\\".$_date_, \@stubTasks);
 				}
 				
 				$_loop_ = 0;
@@ -97,25 +128,7 @@ sub collectResults()
 	my $logID = shift;
 	my @tasks = @{my $t = shift};
 	
-	# TO-DO: Make sure tasks and results are perfect match.
-	my $waitResults = 1;
-	while ($waitResults)
-	{
-		print YELLOW, "  All machines are testing for ".$logID."...\n", RESET;
-		sleep($_waitLong_);
-		my @results = glob($_autoTestDir_."\\".$logID."\\*.xml");
-		if (scalar @results == scalar @tasks)
-		{
-		
-			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
-			if (eof $vmResult)
-			{
-				$waitResults = 0;				
-			}
-			close($vmResult);			
-		}
-	}
-	print GREEN, "  All testing are completed\n", RESET;
+	&waitResults($logID, \@tasks);
 	system("rebot --name ".$logID." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\".$logID."\\*.xml");
 	print CYAN, "  Test result created \n", RESET;
 	&getDateTime("collectResults End");
@@ -135,9 +148,22 @@ sub createClientBatchScript()
 	print $fh "setlocal\n";
 	print $fh "for /f \"tokens=4-5 delims=. \" %%i in ('ver') do set VERSION=%%i.%%j\n";
 	print $fh "for /f \"tokens=3 delims= \" %%g in ('reg query \"hklm\\system\\controlset001\\control\\nls\\language\" /v Installlanguage') do set LANGUAGE=%%g\n";
+	my $outputName;
+	my $outputDir;
+
 	for my $task (@tasks)
 	{
-		my $outputName = $task->{OS}."_".$task->{LCID}."_".$task->{TESTCASE};
+		if ($_LOGID_ =~ /(\d+)/)
+		{
+			$outputDir = $_LOGID_;
+			$outputName = $task->{OS}."_".$task->{LCID}."_".$task->{TESTCASE};
+		}
+		else
+		{
+			$outputDir = "PSPX10_StubInstaller\\".$_date_;
+			$outputName = $task->{OS}."_".$task->{LCID}."_".$task->{TESTCASE}."_".$_STUB_;
+		}
+		
 		my $processor = "AMD64";
 		my $version = "10.0";
 		if ($task->{OS} eq "Win7-32")
@@ -154,14 +180,14 @@ sub createClientBatchScript()
 			$version = "6.3";
 		}
 		print $fh "if \"%PROCESSOR_ARCHITECTURE%\" == \"".$processor."\" if \"%version%\" == \"".$version."\" if \"%language%\" == \"".$task->{LCID}."\" ";
-		print $fh "if not exist ".$_autoTestDir_."\\".$_LOGID_."\\".$outputName.".xml (\n";
+		print $fh "if not exist ".$_autoTestDir_."\\".$outputDir."\\".$outputName.".xml (\n";
 		print $fh "\techo ".$outputName."\n";
 		
 		print $fh "\trobot ^\n";
 		print $fh "\t--test ".$task->{TESTCASE}." ^\n";
 		print $fh "\t--name ".$outputName." ^\n";
 		print $fh "\t--variablefile ".$variableFile." ^\n";
-		print $fh "\t--outputdir ".$_autoTestDir_."\\".$_LOGID_." ^\n";
+		print $fh "\t--outputdir ".$_autoTestDir_."\\".$outputDir." ^\n";
 		print $fh "\t--output ".$outputName." ^\n";
 		print $fh "\t".$_autoTestDir_.$task->{PROJECT}."\n";
 		print $fh "\tgoto exit\n)\n\n";
@@ -183,47 +209,68 @@ sub dispatchTasks()
 	{
 		my $task = shift(@tasks);
 		my $machine = "Win10-64-EN";
+		my $computer = "TPE-ARIS-CHEN";
 		if ($task->{OS} eq "Win10-64")
 		{
-			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";}
-			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";}
-			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";}
-			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";}
-			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";}
-			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";}
-			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";}
-			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";}
+			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "040D") {$machine = "Win10-64-IL";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";	$computer = "TPE-ARIS-CHEN";}
+			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0415") {$machine = "Win10-64-PL";	$computer = "TPE-ARIS-CHEN-7";}
+			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";	$computer = "TPE-ARIS-CHEN-7";}
 		}
 		elsif ($task->{OS} eq "Win7-64")
 		{
-			
+			if ($task->{LCID} eq "0404") {$machine = "Win7SP1-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
 		}
 		elsif ($task->{OS} eq "Win81-64")
 		{
-			
+			if ($task->{LCID} eq "0404") {$machine = "Win81-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
 		}	
 		
 		print YELLOW, "  Selected machine ".$machine." for test case ".$task->{TESTCASE}."\n", RESET;
-		# If machine is not running, start it
-		open(my $vmResult, "powershell Get-VM -VMName ".$machine." \"| Where-Object {\$_.State -eq 'Running'} \" |");
-		if (eof $vmResult)
+		
+		my $goNext = 0;
+		open(my $computerResult, "powershell Get-VM -ComputerName ".$computer." \"| Where-Object {\$_.State -eq 'Running'} | measure | % {\$_.Count} \" |");
+		while (<$computerResult>)
 		{
-			print GREEN, "  ".$machine." is available.\n", RESET;
-			system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -Confirm:\$false");
-			system("powershell Start-VM -VMName ".$machine);
-
-			push(@_runningMachines_, $machine);
-		}
-		else
-		{
-			print RED, "  ".$machine." is working on previous test case...\n", RESET;
-			push(@tasks, $task);
+			if ($_ >= $_vmPerServer_)
+			{
+				print RED, "  ".$machine." on ".$computer." is working on other test case...\n", RESET;
+				push(@tasks, $task);
 			
-			sleep($_waitShort_);
-			# Check if any running machines are available.
+				sleep($_waitShort_);
+				# Check if any running machines are available.
+			}
+			else
+			{
+				# If machine is not running, start it
+				open(my $vmResult, "powershell Get-VM -VMName ".$machine." -ComputerName ".$computer." \"| Where-Object {\$_.State -eq 'Running'} \" |");
+				if (eof $vmResult)
+				{
+					print GREEN, "  ".$machine." is available.\n", RESET;
+					system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -ComputerName ".$computer." -Confirm:\$false");
+					system("powershell Start-VM -VMName ".$machine." -ComputerName ".$computer);
+
+					push(@_runningMachines_, $machine);
+				}
+				else
+				{
+					print RED, "  ".$machine." is working on previous test case...\n", RESET;
+					push(@tasks, $task);
+					
+					sleep($_waitShort_);
+					# Check if any running machines are available.
+				}
+				close($vmResult);
+			}
 		}
-		close($vmResult);
-		print YELLOW, "  There are ".scalar @tasks." tasks still remain.\n", RESET;
+		close($computerResult);
+				print YELLOW, "  There are ".scalar @tasks." tasks still remain.\n", RESET;
 	}
 	&getDateTime("dispatchTasks End")
 }
@@ -239,6 +286,46 @@ sub getDateTime()
 							$min,
 							$sec );
 	print BRIGHT_MAGENTA, "  ========== ", BOLD BRIGHT_BLUE, "[$DateTime]: $_[0]\n", RESET;
+}
+
+#
+#	Get the list of result xml files to see if they match given tasks.
+#
+sub matchTasksWithResults()
+{
+	&getDateTime("matchTasksWithResults Start");
+	my $logID = shift;
+	my @tasks = @{my $t = shift};
+	my $stub = shift;
+	my @results = glob($_autoTestDir_."\\".$logID."\\*.xml");	
+	my $matchCount = 0;
+	my $substring = "";
+	
+	print CYAN, "  There are ". scalar @tasks." tasks and ".scalar @results." results to match.\n", RESET;		
+	foreach my $result (@results) 
+	{		
+		foreach my $task (@tasks)
+		{
+			if (defined $stub)
+			{
+				$substring = sprintf("%s_%s_%s_%s", $task->{OS}, $task->{LCID}, $task->{TESTCASE}, $stub);
+			}
+			else
+			{
+				$substring = sprintf("%s_%s_%s", $task->{OS}, $task->{LCID}, $task->{TESTCASE});
+			}
+		
+			if (index($result, $substring) != -1)
+			{
+				$matchCount++;
+				print GREEN, "  Task result found: ", RESET, $result, "\n", RESET;
+				last;
+			}
+		}
+	}
+	
+	&getDateTime("matchTasksWithResults End");
+	return $matchCount == scalar @tasks;
 }
 
 sub parseConfig()
@@ -275,6 +362,7 @@ sub parseJob()
 	while(<$fh>)
 	{
 		if ($_ =~ /LOGID="(\d+)"/) {	$_LOGID_ = $1;	}
+		elsif ($_ =~ /LOGID="(PSP2018\S+)"/) {	$_STUB_ = $1;	}
 		elsif ($_ =~ /CLASS="(\S+)"/) {	$_CLASS_ = $1;	}
 		elsif ($_ =~ /OPTIONS="(\S+)"/) {	$_OPTIONS_ = $1;	}
 		elsif ($_ =~ /CUSTOMER="(\S+)"/) {	$_CUSTOMER_ = $1;	}
@@ -283,7 +371,7 @@ sub parseJob()
 		elsif ($_ =~ /ALIAS="(\S+)"/) {	$_ALIAS_ = $1;	}
 	}
 	close($fh);
-	print YELLOW, "  CLASS ", RESET, $_CLASS_, YELLOW, " CUSTOMER ", RESET, $_CUSTOMER_, YELLOW, " OPTIONS ", RESET, $_OPTIONS_."\n", RESET;
+	print YELLOW, "  CLASS ", RESET, $_CLASS_, YELLOW, " CUSTOMER ", RESET, $_CUSTOMER_, YELLOW, " OPTIONS ", RESET, $_OPTIONS_, YELLOW, " LOGID ", RESET, $_LOGID_, YELLOW, " STUB ", RESET, $_STUB_."\n", RESET;
 	
 	my @result = ();
 	for my $config (@_dataServerConfig_) 
@@ -307,6 +395,36 @@ sub parseJob()
 	{
 		print "\t$_->{OS} $_->{LCID} $_->{TESTCASE}\n";
 	}
-	return @result;
 	&getDateTime("parseJob End");
+	return @result;
+}
+
+#
+#	To wait results from all VMs.
+#
+sub waitResults()
+{
+	&getDateTime("waitResults Start");
+	my $logID = shift;
+	my @tasks = @{my $t = shift};
+	my $stub = shift;
+	
+	# TO-DO: Make sure tasks and results are perfect match.
+	my $waitResults = 1;
+	while ($waitResults)
+	{
+		print YELLOW, "  All machines are testing for ".$logID."...\n", RESET;
+		sleep($_waitLong_);
+		if (&matchTasksWithResults($logID, \@tasks, $stub))
+		{		
+			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
+			if (eof $vmResult)
+			{
+				$waitResults = 0;				
+			}
+			close($vmResult);			
+		}
+	}
+	print GREEN, "  All testing are completed\n", RESET;
+	&getDateTime("waitResults End");
 }
