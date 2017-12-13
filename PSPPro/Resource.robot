@@ -49,6 +49,18 @@ Click Varied Image
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Run Keywords    Click Image    ${variedName}    AND    Exit For Loop
 	
+Does Varied Exist
+    [Documentation]    To get varied images and check if one exist
+	[Arguments]    ${reference_image}
+	${result} =    Create List    FAIL    ${EMPTY}
+	Take A Screenshot
+	:FOR    ${INDEX}    IN RANGE    1    6
+	\    ${variedName} =    Catenate    ${reference_image}    ${INDEX}
+	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
+	\    ${result} =    Run Keyword If    ${hasImage} == ('PASS', True)    Create List    PASS    ${variedName}
+	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop
+	[Return]    ${result}
+	
 Get System Language
     # Get the current language from registry
     &{lang}    Read Registry Value    HKLM\\SYSTEM\\CurrentControlSet\\Control\\Nls\\Language    InstallLanguage
@@ -96,7 +108,7 @@ Press Shortcut Key
 	...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.B
 	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.T
 	...    ELSE IF    '${Lang}' == '0413' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.V
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Finish'    Click Image    Button Finish
+	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Finish'    Click Varied Image    Button Finish
 	...    ELSE IF    '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.F
     ...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Install Now'    Press Combination    Key.AltLeft    Key.J
 	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Install Now'    Click Varied Image    Button Install Now
@@ -261,3 +273,11 @@ Type Onscreen Keyboard
 	:FOR    ${INDEX}    IN RANGE    0    6
 	\    Press Combination    Key.Down
 	Press Combination    Key.Enter	
+	
+Wait For Varied
+    [Arguments]    ${reference_image}    ${timeout}
+	${count} =    Evaluate    ${timeout} / 60
+    :FOR    ${INDEX}    IN RANGE    0    ${count}
+	\    Sleep    1m
+	\    ${result} =    Does Varied Exist    ${reference_image}
+	\    Run Keyword If    '@{result}[0]' == 'PASS'    Exit For Loop

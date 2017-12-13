@@ -187,15 +187,15 @@ Process Dialog Register
     [Arguments]    ${Lang}
 	Sleep    20s
 	Take A Screenshot
-    Wait For    Dialog Register    480
-	Click Image    Dialog Register
+    Wait For Varied    Dialog Register    480
+	Click Varied Image    Dialog Register
 	Press Shortcut Key    ${Lang}    Email
 	Type Keyboard    ${Lang}    ${Email}
-    Click Image    Button Register
+    Click Varied Image    Button Register
 	Sleep    30s
 	Take A Screenshot
-    Wait For    Button Continue    240
-    Click Image    Button Continue
+    Wait For Varied    Button Continue    240
+    Click Varied Image    Button Continue
 
 Process Page User Information
     [Arguments]    ${Lang}
@@ -375,13 +375,7 @@ Select Switch Language
 	\    ...    ELSE    Press Combination    Key.Up
 	Press Combination    Key.Enter
 	Sleep    5s
-	${hasDialog} =    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language Restart
-	${hasDialog} =    Run Keyword If    ${hasDialog} != ('PASS', True)    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language Restart 2
-	...    ELSE    Set Variable    ('PASS', True)
-	${hasDialog} =    Run Keyword If    ${hasDialog} != ('PASS', True)    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language Restart 3
-	...    ELSE    Set Variable    ('PASS', True)
-    Take A Screenshot
-	Run Keyword If    ${hasDialog} != ('PASS', True)    Fail    Dialog not exist
+	Does Varied Exist    Dialog Switch Language Restart
 	Press Combination    Key.Enter	
 	
 Switch All Languages
@@ -400,13 +394,7 @@ Switch Language
 	Press Combination    Key.Up
 	Press Combination    Key.Enter
 	Sleep    5s
-	${hasDialog} =    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language
-	${hasDialog} =    Run Keyword If    ${hasDialog} != ('PASS', True)    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language 2
-	...    ELSE    Set Variable    ('PASS', True)
-	${hasDialog} =    Run Keyword If    ${hasDialog} != ('PASS', True)    Run Keyword And Ignore Error    Does Exist    Dialog Switch Language 3
-	...    ELSE    Set Variable    ('PASS', True)
-    Take A Screenshot
-	Run Keyword If    ${hasDialog} != ('PASS', True)    Fail    Dialog not exist
+	Does Varied Exist    Dialog Switch Language
 	Select Switch Language    ${LANG}    ${To}
 	Click To The Below Of Image    Icon Light    32
 	Press Combination    Key.Up
