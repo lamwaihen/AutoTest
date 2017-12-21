@@ -43,11 +43,18 @@ ${BUILD}          \    # Build package name like "Main-Branch_20.0.0.132_PhotoUl
 
 *** Keywords ***
 Click Varied Image
-    [Arguments]    ${ImageName}
+    [Arguments]    ${reference_image}
 	:FOR    ${INDEX}    IN RANGE    1    6
-	\    ${variedName} =    Catenate    ${ImageName}    ${INDEX}
+	\    ${variedName} =    Catenate    ${reference_image}    ${INDEX}
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Run Keywords    Click Image    ${variedName}    AND    Exit For Loop
+	
+Click To The Below Of Varied Image
+    [Arguments]    ${reference_image}    ${offset}
+	:FOR    ${INDEX}    IN RANGE    1    6
+	\    ${variedName} =    Catenate    ${reference_image}    ${INDEX}
+	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
+	\    Run Keyword If    ${hasImage} == ('PASS', True)    Run Keywords    Click To The Below Of Image    ${variedName}    ${offset}    AND    Exit For Loop
 	
 Does Varied Exist
     [Documentation]    To get varied images and check if one exist
@@ -58,6 +65,7 @@ Does Varied Exist
 	\    ${variedName} =    Catenate    ${reference_image}    ${INDEX}
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
 	\    ${result} =    Run Keyword If    ${hasImage} == ('PASS', True)    Create List    PASS    ${variedName}
+	\    ...    ELSE    Create List    FAIL    ${EMPTY}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop
 	[Return]    ${result}
 	
@@ -69,8 +77,7 @@ Get System Language
 
 Hide Cmd
     [Documentation]    Try to hide the command prompt window to avoid overlapping other dialogs.
-	${img} =    Set Variable If    '${OS}' != '6.1'    Icon Command Prompt    Icon Command Prompt Win7
-	Click Image    ${img}
+	Click Image    Icon Command Prompt
 	Sleep    2s
 	Press Combination    Key.Down
 	Press Combination    Key.Down
@@ -102,7 +109,7 @@ Press Shortcut Key
 	...    ELSE IF    '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.A
 	...    ELSE IF    '${Shortcut}' == 'Close'    Press Combination    Key.AltLeft    Key.F4
 	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Email'    Press Combination    Key.Tab
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Email'    Click To The Below Of Image    Editbox Email    24
+	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Email'    Click To The Below Of Varied Image    Editbox Email    24
 	...    ELSE IF    '${Lang}' == '0C0A' and '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.C
 	...    ELSE IF    '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.E
 	...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.B
@@ -135,6 +142,8 @@ Set Image Horizon Library
 	${folder} =    Set Variable If    '@{result}[0]' == 'PASS'    ${LogID}    ${stubfolder}	
 	${result} =    Run Keyword And Return Status    List Should Contain Value    ${Languages}    ${Lang}
 	${imgLang} =    Set Variable If    '${result}' == 'True'    ${Lang}    0409
+	${imgLang} =    Run Keyword If    '${OS}' == '6.1'    Catenate    ${imgLang}    Win7
+	...   ELSE    Set Variable    ${imgLang}
     ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${imgLang}
     ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\${folder}
 	
@@ -192,13 +201,25 @@ Set System Language Preferences
 	\    ${canMoveUp} =    Run Keyword And Ignore Error    Does Exist    Button MoveUp
 	\    Run Keyword If    ${canMoveUp} != ('PASS', True)    Exit For Loop	
     Press Combination    Key.AltLeft    Key.F4		
-	
+
 Take Screenshot And Wait
     [Documentation]    Take the amount of screenshots while waiting, so that we can monitor the process.
-	[Arguments]    ${Amount}    
-	:FOR    ${INDEX}    IN RANGE    0    ${Amount}
+	[Arguments]    ${time}
+	${count} =    Evaluate    ${time} / 60
+    :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Take A Screenshot
 	\    Sleep    1m
+	
+Take Screenshot And Wait For
+    [Documentation]    Take the amount of screenshots while waiting for specific image, so that we can monitor the process.
+	[Arguments]    ${reference_image}    ${timeout}
+    Take A Screenshot
+	${count} =    Evaluate    ${timeout} / 60
+    :FOR    ${INDEX}    IN RANGE    0    ${count}
+	\    Sleep    1m
+	\    Take A Screenshot	
+	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${reference_image}
+	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop	
 	
 Type Keyboard
     [Arguments]    ${Lang}    ${Input}
@@ -277,7 +298,9 @@ Type Onscreen Keyboard
 Wait For Varied
     [Arguments]    ${reference_image}    ${timeout}
 	${count} =    Evaluate    ${timeout} / 60
+	${result} =    Create List    FAIL    ${EMPTY}
     :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Sleep    1m
 	\    ${result} =    Does Varied Exist    ${reference_image}
 	\    Run Keyword If    '@{result}[0]' == 'PASS'    Exit For Loop
+	Run Keyword If    '@{result}[0]' == 'FAIL'    Fail

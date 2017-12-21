@@ -19,6 +19,51 @@ Initialize
     Set Suite Variable    ${SetupDir}
     Hide Cmd	
 	
+Blind Install Build
+	[Documentation]    For Windows 7 which we can't use ImageHorizonLibrary.
+    [Arguments]    ${Build}    ${Lang}=0409    ${OSbits}=64bit    # "64bit", "32bit" or "Both"
+    Download Build    ${Build}
+    ${Exe}    Get Setup Exe
+    Launch Application    ${Exe}
+	${Serial} =    Get Serial Number
+	Download Stub
+	Sleep    10s
+	Run Keyword If    ('${ALIAS}' == 'StubInstaller' and '${VERSION}' == '') or '${ALIAS}' != 'StubInstaller'    Run Keywords    	Sleep    300
+	...    AND    Move To    456    765
+    ...    AND    Click
+	...    AND    Sleep    5s
+	...    AND    Move To    1130    845
+	...    AND    Click
+	...    AND    Comment    Page User Information
+    ...    AND    Sleep    30s
+	...    AND    Move To    454    546
+	...    AND    Click
+    ...    AND    Type Keyboard    ${Lang}    ${Serial}
+	...    AND    Sleep    5s
+	...    AND    Move To    1130    845
+	...    AND    Click
+	...    AND    Comment    Page Installation Options
+    ...    AND    Sleep    30s
+	...    AND    Move To    1130    845
+	...    AND    Click
+	...    AND    Comment    Page Features Settings 
+    ...    AND    Sleep    30s
+	...    AND    Move To    1130    845
+	...    AND    Click
+	...    AND    Comment    Page Completed
+    ...    AND    Sleep    600s
+	...    AND    Move To    456    777
+    ...    AND    Click
+	...    AND    Sleep    5s	
+	...    AND    Move To    1130    845
+	...    AND    Click	
+    ...    AND    Sleep    2m
+	...    AND    Take Screenshot And Wait For    Web Thank You for Installing    480
+    ...    AND    Click Image    Web Thank You for Installing
+    ...    AND    Press Shortcut Key    ${Lang}    Close
+	Finish Stub
+	Sleep    3m
+	
 Install Build
     [Arguments]    ${Build}    ${Lang}=0409    ${OSbits}=64bit    # "64bit", "32bit" or "Both"
     [Timeout]    30min
@@ -27,8 +72,7 @@ Install Build
     Launch Application    ${Exe}
 	Download Stub
 	Sleep    10s
-	Take A Screenshot
-	Run Keyword If    ('${ALIAS}' == 'StubInstaller' and '${VERSION}' == '') or '${ALIAS}' != 'StubInstaller'    Run Keywords    Wait For    Page EULA    240
+	Run Keyword If    ('${ALIAS}' == 'StubInstaller' and '${VERSION}' == '') or '${ALIAS}' != 'StubInstaller'    Run Keywords    	Take Screenshot And Wait For    Page EULA    300
 	...    AND    Click Image    Page EULA
     ...    AND    Press Shortcut Key    ${Lang}    Accept
 	...    AND    Sleep    5s
@@ -36,14 +80,12 @@ Install Build
     ...    AND    Process Page User Information    ${Lang}
     ...    AND    Process Page Installation Options    ${OSbits}
     ...    AND    Process Page Features Settings    ${Lang}
-    ...    AND    Take Screenshot And Wait    5
-    ...    AND    Wait For    Page completed    600
+    ...    AND    Take Screenshot And Wait For    Page completed    600
     ...    AND    Click Image    Checkbox check updates
     ...    AND    Press Shortcut Key    ${Lang}    Finish
     ...    AND    Comment    Wait For    PSPX10 Initialization    240
     ...    AND    Sleep    2m
-	...    AND    Take A Screenshot
-    ...    AND    Wait For    Web Thank You for Installing    480
+	...    AND    Take Screenshot And Wait For    Web Thank You for Installing    480
     ...    AND    Click Image    Web Thank You for Installing
     ...    AND    Press Shortcut Key    ${Lang}    Close
 	Finish Stub
@@ -318,8 +360,7 @@ Initial Launch
 	Sleep    10s
 	Take A Screenshot
     Wait For    Splash Screen    480
-	Take Screenshot And Wait    1
-    Wait For    Welcome Essentials Light    600
+	Take Screenshot And Wait For    Welcome Essentials Light    600
     Process Guided Tour    Edit    Light
 	${pos} =    Wait For    Mode Button Home Light    240
     Click To The Above Of    ${pos}    0
