@@ -364,9 +364,10 @@ Initial Launch
     Process Guided Tour    Edit    Light
 	${pos} =    Wait For    Mode Button Home Light    240
     Click To The Above Of    ${pos}    0
-    Wait For    Welcome Essentials Light    240
+    Take Screenshot And Wait For    Welcome Essentials Light    300
 	Defocus
-    Click Image    Radio Workspaces Complete
+    ${pos} =    Take Screenshot And Wait For    Radio Workspaces Complete    300
+	Click To The Above Of    ${pos}    0
 	Move To    960    540
 	Sleep    1m
     Process Guided Tour    Manage    Dark
@@ -374,9 +375,9 @@ Initial Launch
     Process Guided Tour    Edit    Dark
     ${pos} =    Wait For    Mode Button Home Dark    240
 	Click To The Above Of    ${pos}    0
-    Wait For    Welcome Essentials Dark    240
+    Take Screenshot And Wait For    Welcome Essentials Dark    300
     Click Image    Radio Workspaces Essentials
-    Wait For    Welcome Essentials Light    240
+    Take Screenshot And Wait For    Welcome Essentials Light    300
 
 Select All Languages
     [Documentation]    To select all language options in the tree control when installing English version.

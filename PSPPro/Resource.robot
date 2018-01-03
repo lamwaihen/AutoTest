@@ -214,12 +214,17 @@ Take Screenshot And Wait For
     [Documentation]    Take the amount of screenshots while waiting for specific image, so that we can monitor the process.
 	[Arguments]    ${reference_image}    ${timeout}
     Take A Screenshot
+	${result} =    Create List    ${0}    ${0}
 	${count} =    Evaluate    ${timeout} / 60
     :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Sleep    1m
 	\    Take A Screenshot	
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${reference_image}
+	\    ${result} =    Run Keyword If    ${hasImage} == ('PASS', True)    Locate    ${reference_image}
+	\    ...    ELSE    Create List    ${0}    ${0}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop	
+	Run Keyword If    ${result} == (0, 0)    Fail
+	[Return]    ${result}
 	
 Type Keyboard
     [Arguments]    ${Lang}    ${Input}
@@ -257,13 +262,13 @@ Type Keyboard
 	\    ...    ELSE IF    '${char}' == '5'    Press Combination    Key.5
 	\    ...    ELSE IF    '${char}' == '6'    Press Combination    Key.6
 	\    ...    ELSE IF    '${char}' == '9'    Press Combination    Key.9
-	\    ...    ELSE IF    '${Lang}' == '0407' and '${char}' == '@'    Press Combination    Key.AltRight    Key.Q
+	\    ...    ELSE IF    '${Lang}' == '0407' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '040C' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '0410' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '0411' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '0413' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '0419' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0C0A' and '${char}' == '@'    Press Combination    Key.AltRight    Key.2
+	\    ...    ELSE IF    '${Lang}' == '0C0A' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${char}' == '.'    Press Combination    Key..
 	\    ...    ELSE IF    '${char}' == '-'    Press Combination    Key.-
