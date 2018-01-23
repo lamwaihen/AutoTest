@@ -223,7 +223,7 @@ Take Screenshot And Wait For
 	\    ${result} =    Run Keyword If    ${hasImage} == ('PASS', True)    Locate    ${reference_image}
 	\    ...    ELSE    Create List    ${0}    ${0}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop	
-	Run Keyword If    ${result} == (0, 0)    Fail
+	Run Keyword If    (@{result}[0] == ${0} and @{result}[1] == ${0})    Fail
 	[Return]    ${result}
 	
 Type Keyboard

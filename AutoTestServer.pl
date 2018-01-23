@@ -22,6 +22,7 @@ my $_input_ = "";
 my $_date_ = "";
 
 # Jobs
+my $_BUILD_ = "";			# e.g. "Main-Branch_20.0.0.132b_PHOTOULT(QA)-PF(RELEASE)_LOGID563719"
 my $_LOGID_ = "";			# e.g. "563524"
 my $_STUB_ = "";			# e.g. "PSP2018_Pro"
 my $_CLASS_ = "";			# e.g. "PSPX10"
@@ -49,7 +50,7 @@ sub main()
 		if (scalar @_files_ > 0)
 		{
 			# Make sure no VM is running
-			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
+			open(my $vmResult, "powershell Get-VM -ComputerName TPE-ATSERVER01,TPE-ATSERVER02,TPE-ATSERVER03 \"| Where-Object {\$_.State -eq 'Running'} \" |");
 			if (eof $vmResult)
 			{
 				my @stubTasks;
@@ -83,8 +84,9 @@ sub main()
 					}
 					
 					# Shutdown the VMs.
-					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ARIS-CHEN -TurnOff");
-					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ARIS-CHEN-7 -TurnOff");
+					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ATSERVER01 -TurnOff");
+					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ATSERVER02 -TurnOff");
+					system("powershell Stop-VM -VMName Win* -ComputerName TPE-ATSERVER03 -TurnOff");
 					
 					# Remove the job.
 					if ($_LOGID_ ne "")
@@ -129,7 +131,7 @@ sub collectResults()
 	my @tasks = @{my $t = shift};
 	
 	&waitResults($logID, \@tasks);
-	system("rebot --name ".$logID." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\".$logID."\\*.xml");
+	system("rebot --name ".$_BUILD_." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\".$logID."\\*.xml");
 	print CYAN, "  Test result created \n", RESET;
 	&getDateTime("collectResults End");
 }
@@ -209,33 +211,62 @@ sub dispatchTasks()
 	{
 		my $task = shift(@tasks);
 		my $machine = "Win10-64-EN";
-		my $computer = "TPE-ARIS-CHEN";
+		my $computer = "TPE-ATSERVER03";
 		if ($task->{OS} eq "Win10-64")
 		{
-			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "040D") {$machine = "Win10-64-IL";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";	$computer = "TPE-ARIS-CHEN";}
-			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0415") {$machine = "Win10-64-PL";	$computer = "TPE-ARIS-CHEN-7";}
-			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";	$computer = "TPE-ARIS-CHEN-7";}
+			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "040D") {$machine = "Win10-64-IL";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0415") {$machine = "Win10-64-PL";	$computer = "TPE-ATSERVER03";}
+			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";	$computer = "TPE-ATSERVER03";}
 		}
 		elsif ($task->{OS} eq "Win7-64")
 		{
-			if ($task->{LCID} eq "0404") {$machine = "Win7SP1-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
+			if ($task->{LCID} eq "0404") {$machine = "Win7SP1-64-TW";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0407") {$machine = "Win7SP1-64-DE";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0409") {$machine = "Win7SP1-64-EN";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0C0A") {$machine = "Win7SP1-64-ES";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "040C") {$machine = "Win7SP1-64-FR";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0410") {$machine = "Win7SP1-64-IT";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0411") {$machine = "Win7SP1-64-JP";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0413") {$machine = "Win7SP1-64-NL";	$computer = "TPE-ATSERVER01";}
+			elsif ($task->{LCID} eq "0419") {$machine = "Win7SP1-64-RU";	$computer = "TPE-ATSERVER01";}
 		}
 		elsif ($task->{OS} eq "Win81-64")
 		{
-			if ($task->{LCID} eq "0404") {$machine = "Win81-64-TW";	$computer = "TPE-ARIS-CHEN-7";}
+			if ($task->{LCID} eq "0404") {$machine = "Win81-64-TW";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0407") {$machine = "Win81-64-DE";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0409") {$machine = "Win81-64-EN";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0C0A") {$machine = "Win81-64-ES";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "040C") {$machine = "Win81-64-FR";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0410") {$machine = "Win81-64-IT";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0411") {$machine = "Win81-64-JP";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0413") {$machine = "Win81-64-NL";	$computer = "TPE-ATSERVER02";}
+			elsif ($task->{LCID} eq "0419") {$machine = "Win81-64-RU";	$computer = "TPE-ATSERVER02";}
 		}	
 		
 		print YELLOW, "  Selected machine ".$machine." for test case ".$task->{TESTCASE}."\n", RESET;
-		
+
 		my $goNext = 0;
-		open(my $computerResult, "powershell Get-VM -ComputerName ".$computer." \"| Where-Object {\$_.State -eq 'Running'} | measure | % {\$_.Count} \" |");
+		# Check if VM exists in specific computer
+		open (my $computerExist, "powershell Get-VM -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.Name -eq '".$machine."'} | measure | % {\$_.Count} \" |");
+		while (<$computerExist>)
+		{
+			if ($_ == 0)
+			{
+				print RED, "  ".$machine." on ".$computer." is not available for testing...\n", RESET;
+				$goNext = 1;
+			}
+		}
+		close($computerExist);
+		($goNext == 1) and next;
+		
+		open(my $computerResult, "powershell Get-VM -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} | measure | % {\$_.Count} \" |");
 		while (<$computerResult>)
 		{
 			if ($_ >= $_vmPerServer_)
@@ -249,11 +280,16 @@ sub dispatchTasks()
 			else
 			{
 				# If machine is not running, start it
-				open(my $vmResult, "powershell Get-VM -VMName ".$machine." -ComputerName ".$computer." \"| Where-Object {\$_.State -eq 'Running'} \" |");
+				open(my $vmResult, "powershell Get-VM -VMName ".$machine." -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} \" |");
 				if (eof $vmResult)
 				{
 					print GREEN, "  ".$machine." is available.\n", RESET;
 					system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -ComputerName ".$computer." -Confirm:\$false");
+					
+					# Temporarily add more resources
+					system("powershell Set-VMMemory -VMName ".$machine." -ComputerName ".$computer." -DynamicMemoryEnabled \$false -StartupBytes 4096MB");
+					system("powershell Set-VMProcessor -VMName ".$machine." -ComputerName ".$computer." -Count 4");
+					
 					system("powershell Start-VM -VMName ".$machine." -ComputerName ".$computer);
 
 					push(@_runningMachines_, $machine);
@@ -270,7 +306,7 @@ sub dispatchTasks()
 			}
 		}
 		close($computerResult);
-				print YELLOW, "  There are ".scalar @tasks." tasks still remain.\n", RESET;
+		print YELLOW, "  There are ".scalar @tasks." tasks still remain.\n", RESET;
 	}
 	&getDateTime("dispatchTasks End")
 }
@@ -373,6 +409,8 @@ sub parseJob()
 	close($fh);
 	print YELLOW, "  CLASS ", RESET, $_CLASS_, YELLOW, " CUSTOMER ", RESET, $_CUSTOMER_, YELLOW, " OPTIONS ", RESET, $_OPTIONS_, YELLOW, " LOGID ", RESET, $_LOGID_, YELLOW, " STUB ", RESET, $_STUB_."\n", RESET;
 	
+	$_BUILD_ = $_OPTIONS_."_".$_VERSION_.$_VERSIONEXTENSION_."_".$_CUSTOMER_."_LOGID".$_LOGID_;
+	
 	my @result = ();
 	for my $config (@_dataServerConfig_) 
 	{
@@ -415,15 +453,12 @@ sub waitResults()
 	{
 		print YELLOW, "  All machines are testing for ".$logID."...\n", RESET;
 		sleep($_waitLong_);
-		if (&matchTasksWithResults($logID, \@tasks, $stub))
-		{		
-			open(my $vmResult, "powershell Get-VM \"| Where-Object {\$_.State -eq 'Running'} \" |");
-			if (eof $vmResult)
-			{
-				$waitResults = 0;				
-			}
-			close($vmResult);			
+		open(my $vmResult, "powershell Get-VM -ComputerName TPE-ATSERVER01,TPE-ATSERVER02,TPE-ATSERVER03 \"| Where-Object {\$_.State -eq 'Running'} \" |");
+		if (&matchTasksWithResults($logID, \@tasks, $stub) || eof $vmResult)
+		{
+			$waitResults = 0;				
 		}
+		close($vmResult);			
 	}
 	print GREEN, "  All testing are completed\n", RESET;
 	&getDateTime("waitResults End");

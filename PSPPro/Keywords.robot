@@ -66,7 +66,6 @@ Blind Install Build
 	
 Install Build
     [Arguments]    ${Build}    ${Lang}=0409    ${OSbits}=64bit    # "64bit", "32bit" or "Both"
-    [Timeout]    30min
     Download Build    ${Build}
     ${Exe}    Get Setup Exe
     Launch Application    ${Exe}
@@ -81,7 +80,7 @@ Install Build
     ...    AND    Process Page Installation Options    ${OSbits}
     ...    AND    Process Page Features Settings    ${Lang}
     ...    AND    Take Screenshot And Wait For    Page completed    600
-    ...    AND    Click Image    Checkbox check updates
+    ...    AND    Click Varied Image    Checkbox check updates
     ...    AND    Press Shortcut Key    ${Lang}    Finish
     ...    AND    Comment    Wait For    PSPX10 Initialization    240
     ...    AND    Sleep    2m
@@ -244,7 +243,7 @@ Process Page User Information
     ${Serial} =    Get Serial Number
 	Sleep    10s
 	Take A Screenshot
-    Run Keyword If    '${Serial}' != ''    Run Keywords    Wait For    Page User information    240
+    Run Keyword If    '${Serial}' != ''    Run Keywords    Wait For Varied    Page User information    240
     ...    AND    Press Shortcut Key    ${Lang}    Serial Number
     ...    AND    Type Keyboard    ${Lang}    ${Serial}
     ...    AND    Press Shortcut Key    ${Lang}    Next	
@@ -255,7 +254,7 @@ Process Page Installation Options
 	Sleep    10s
 	Take A Screenshot
 	Run Keyword If    ${is32or64} != ('PASS', None)
-    ...    Run Keywords    Wait For    Page Installation options    240
+    ...    Run Keywords    Wait For Varied    Page Installation options    240
     ...    AND    Select Install Options    ${OSbits}
     ...    AND    Take A Screenshot
     ...    AND    Press Shortcut Key    ${Lang}    Next
@@ -376,7 +375,8 @@ Initial Launch
     ${pos} =    Wait For    Mode Button Home Dark    240
 	Click To The Above Of    ${pos}    0
     Take Screenshot And Wait For    Welcome Essentials Dark    300
-    Click Image    Radio Workspaces Essentials
+	${pos} =    Take Screenshot And Wait For    Radio Workspaces Essentials    300
+	Click To The Above Of    ${pos}    0
     Take Screenshot And Wait For    Welcome Essentials Light    300
 
 Select All Languages
@@ -401,9 +401,9 @@ Select All Languages
 
 Select Install Options
     [Arguments]    ${OSbits}
-    Run Keyword If    '${OSbits}' == '64bit'    Click Image    Install Option 64bit
-    ...    ELSE IF    '${OSbits}' == '32bit'    Click Image    Install Option 32bit
-    ...    ELSE    Click Image    Install Option both
+    Run Keyword If    '${OSbits}' == '64bit'    Click Varied Image    Install Option 64bit
+    ...    ELSE IF    '${OSbits}' == '32bit'    Click Varied Image    Install Option 32bit
+    ...    ELSE    Click Varied Image    Install Option both
 	
 Select Switch Language
     [Arguments]    ${FromLang}    ${ToLang}
