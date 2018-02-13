@@ -135,7 +135,7 @@ Press Shortcut Key
 	...    ELSE    Fail    Unknown shortcut key
 	
 Set Image Horizon Library
-    [Arguments]    ${Lang}    ${LogID}
+    [Arguments]    ${Class}    ${Lang}    ${LogID}
 	${date} =    Get Current Date    UTC    8h    %Y-%m-%d
 	${stubfolder} =    Catenate    SEPARATOR=\\    PSPX10_StubInstaller    ${date}
 	${result} =    Run Keyword And Ignore Error    Should Match Regexp    ${LOGID}    ^\\d{6}$
@@ -143,8 +143,10 @@ Set Image Horizon Library
 	${result} =    Run Keyword And Return Status    List Should Contain Value    ${Languages}    ${Lang}
 	${imgLang} =    Set Variable If    '${result}' == 'True'    ${Lang}    0409
 	${imgLang} =    Run Keyword If    '${OS}' == '6.1'    Catenate    ${imgLang}    Win7
-	...   ELSE    Set Variable    ${imgLang}
-    ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${imgLang}
+	...   ELSE IF    '${OS}' == '6.3'    Catenate    ${imgLang}    Win8
+	...   ELSE    Catenate    ${imgLang}    Win10
+	${imgFolder} =    Catenate    ${Class}    ${imgLang}
+    ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${imgFolder}
     ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\${folder}
 	
 Set System Fonts
@@ -232,35 +234,66 @@ Type Keyboard
     Take A Screenshot
 	:FOR    ${char}    IN     @{characters}
     \    Run Keyword If    '${char}' == 'a'    Press Combination    Key.A
+	\    ...    ELSE IF    '${char}' == 'A'    Press Combination    Key.ShiftLeft    Key.A
 	\    ...    ELSE IF    '${char}' == 'b'    Press Combination    Key.B
+	\    ...    ELSE IF    '${char}' == 'B'    Press Combination    Key.ShiftLeft    Key.B
 	\    ...    ELSE IF    '${char}' == 'c'    Press Combination    Key.C
 	\    ...    ELSE IF    '${char}' == 'C'    Press Combination    Key.ShiftLeft    Key.C
 	\    ...    ELSE IF    '${char}' == 'd'    Press Combination    Key.D
 	\    ...    ELSE IF    '${char}' == 'D'    Press Combination    Key.ShiftLeft    Key.D
 	\    ...    ELSE IF    '${char}' == 'e'    Press Combination    Key.E
+	\    ...    ELSE IF    '${char}' == 'E'    Press Combination    Key.ShiftLeft    Key.E
+	\    ...    ELSE IF    '${char}' == 'f'    Press Combination    Key.F
+	\    ...    ELSE IF    '${char}' == 'F'    Press Combination    Key.ShiftLeft    Key.F
+	\    ...    ELSE IF    '${char}' == 'g'    Press Combination    Key.G
 	\    ...    ELSE IF    '${char}' == 'G'    Press Combination    Key.ShiftLeft    Key.G
+	\    ...    ELSE IF    '${char}' == 'h'    Press Combination    Key.H
+	\    ...    ELSE IF    '${char}' == 'H'    Press Combination    Key.ShiftLeft    Key.H
 	\    ...    ELSE IF    '${char}' == 'i'    Press Combination    Key.I
+	\    ...    ELSE IF    '${char}' == 'I'    Press Combination    Key.ShiftLeft    Key.I
+	\    ...    ELSE IF    '${char}' == 'j'    Press Combination    Key.J
 	\    ...    ELSE IF    '${char}' == 'J'    Press Combination    Key.ShiftLeft    Key.J
+	\    ...    ELSE IF    '${char}' == 'k'    Press Combination    Key.K
 	\    ...    ELSE IF    '${char}' == 'K'    Press Combination    Key.ShiftLeft    Key.K
 	\    ...    ELSE IF    '${char}' == 'l'    Press Combination    Key.L
+	\    ...    ELSE IF    '${char}' == 'L'    Press Combination    Key.ShiftLeft    Key.L
 	\    ...    ELSE IF    '${char}' == 'm'    Press Combination    Key.M
 	\    ...    ELSE IF    '${char}' == 'M'    Press Combination    Key.ShiftLeft    Key.M
+	\    ...    ELSE IF    '${char}' == 'n'    Press Combination    Key.N
 	\    ...    ELSE IF    '${char}' == 'N'    Press Combination    Key.ShiftLeft    Key.N
 	\    ...    ELSE IF    '${char}' == 'o'    Press Combination    Key.O
+	\    ...    ELSE IF    '${char}' == 'O'    Press Combination    Key.ShiftLeft    Key.O
+	\    ...    ELSE IF    '${char}' == 'p'    Press Combination    Key.P
+	\    ...    ELSE IF    '${char}' == 'P'    Press Combination    Key.ShiftLeft    Key.P
+	\    ...    ELSE IF    '${char}' == 'q'    Press Combination    Key.Q
+	\    ...    ELSE IF    '${char}' == 'Q'    Press Combination    Key.ShiftLeft    Key.Q
 	\    ...    ELSE IF    '${char}' == 'r'    Press Combination    Key.R
 	\    ...    ELSE IF    '${char}' == 'R'    Press Combination    Key.ShiftLeft    Key.R
 	\    ...    ELSE IF    '${char}' == 's'    Press Combination    Key.S
 	\    ...    ELSE IF    '${char}' == 'S'    Press Combination    Key.ShiftLeft    Key.S
+	\    ...    ELSE IF    '${char}' == 't'    Press Combination    Key.T
 	\    ...    ELSE IF    '${char}' == 'T'    Press Combination    Key.ShiftLeft    Key.T
 	\    ...    ELSE IF    '${char}' == 'u'    Press Combination    Key.U
 	\    ...    ELSE IF    '${char}' == 'U'    Press Combination    Key.ShiftLeft    Key.U
+	\    ...    ELSE IF    '${char}' == 'v'    Press Combination    Key.V
 	\    ...    ELSE IF    '${char}' == 'V'    Press Combination    Key.ShiftLeft    Key.V
+	\    ...    ELSE IF    '${char}' == 'w'    Press Combination    Key.W
+	\    ...    ELSE IF    '${char}' == 'W'    Press Combination    Key.ShiftLeft    Key.W
+	\    ...    ELSE IF    '${char}' == 'x'    Press Combination    Key.X
+	\    ...    ELSE IF    '${char}' == 'X'    Press Combination    Key.ShiftLeft    Key.X
+	\    ...    ELSE IF    '${char}' == 'y'    Press Combination    Key.Y
 	\    ...    ELSE IF    '${char}' == 'Y'    Press Combination    Key.ShiftLeft    Key.Y
+	\    ...    ELSE IF    '${char}' == 'z'    Press Combination    Key.Z
+	\    ...    ELSE IF    '${char}' == 'Z'    Press Combination    Key.ShiftLeft    Key.Z
 	\    ...    ELSE IF    '${char}' == '0'    Press Combination    Key.0
+	\    ...    ELSE IF    '${char}' == '1'    Press Combination    Key.1
 	\    ...    ELSE IF    '${char}' == '2'    Press Combination    Key.2
+	\    ...    ELSE IF    '${char}' == '3'    Press Combination    Key.3
 	\    ...    ELSE IF    '${char}' == '4'    Press Combination    Key.4
 	\    ...    ELSE IF    '${char}' == '5'    Press Combination    Key.5
 	\    ...    ELSE IF    '${char}' == '6'    Press Combination    Key.6
+	\    ...    ELSE IF    '${char}' == '7'    Press Combination    Key.7
+	\    ...    ELSE IF    '${char}' == '8'    Press Combination    Key.8
 	\    ...    ELSE IF    '${char}' == '9'    Press Combination    Key.9
 	\    ...    ELSE IF    '${Lang}' == '0407' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${Lang}' == '040C' and '${char}' == '@'    Press Combination    Key.@
@@ -306,6 +339,7 @@ Wait For Varied
 	${result} =    Create List    FAIL    ${EMPTY}
     :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Sleep    1m
+	\    Take A Screenshot	
 	\    ${result} =    Does Varied Exist    ${reference_image}
 	\    Run Keyword If    '@{result}[0]' == 'PASS'    Exit For Loop
 	Run Keyword If    '@{result}[0]' == 'FAIL'    Fail

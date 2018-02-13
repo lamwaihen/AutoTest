@@ -210,68 +210,29 @@ sub dispatchTasks()
 	while(scalar @tasks > 0)
 	{
 		my $task = shift(@tasks);
-		my $machine = "Win10-64-EN";
-		my $computer = "TPE-ATSERVER03";
-		if ($task->{OS} eq "Win10-64")
-		{
-			if ($task->{LCID} eq "0404") {$machine = "Win10-64-TW";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0407") {$machine = "Win10-64-DE";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0C0A") {$machine = "Win10-64-ES";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "040C") {$machine = "Win10-64-FR";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "040D") {$machine = "Win10-64-IL";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0410") {$machine = "Win10-64-IT";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0411") {$machine = "Win10-64-JP";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0413") {$machine = "Win10-64-NL";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0415") {$machine = "Win10-64-PL";	$computer = "TPE-ATSERVER03";}
-			elsif ($task->{LCID} eq "0419") {$machine = "Win10-64-RU";	$computer = "TPE-ATSERVER03";}
-		}
-		elsif ($task->{OS} eq "Win7-64")
-		{
-			if ($task->{LCID} eq "0404") {$machine = "Win7SP1-64-TW";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0407") {$machine = "Win7SP1-64-DE";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0409") {$machine = "Win7SP1-64-EN";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0C0A") {$machine = "Win7SP1-64-ES";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "040C") {$machine = "Win7SP1-64-FR";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0410") {$machine = "Win7SP1-64-IT";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0411") {$machine = "Win7SP1-64-JP";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0413") {$machine = "Win7SP1-64-NL";	$computer = "TPE-ATSERVER01";}
-			elsif ($task->{LCID} eq "0419") {$machine = "Win7SP1-64-RU";	$computer = "TPE-ATSERVER01";}
-		}
-		elsif ($task->{OS} eq "Win81-64")
-		{
-			if ($task->{LCID} eq "0404") {$machine = "Win81-64-TW";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0407") {$machine = "Win81-64-DE";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0409") {$machine = "Win81-64-EN";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0C0A") {$machine = "Win81-64-ES";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "040C") {$machine = "Win81-64-FR";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0410") {$machine = "Win81-64-IT";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0411") {$machine = "Win81-64-JP";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0413") {$machine = "Win81-64-NL";	$computer = "TPE-ATSERVER02";}
-			elsif ($task->{LCID} eq "0419") {$machine = "Win81-64-RU";	$computer = "TPE-ATSERVER02";}
-		}	
-		
-		print YELLOW, "  Selected machine ".$machine." for test case ".$task->{TESTCASE}."\n", RESET;
+		my @vmInfo = &getMatchingVM($task->{OS}, $task->{LCID});		
+		print YELLOW, "  Selected machine ".$vmInfo[0]." for test case ".$task->{TESTCASE}."\n", RESET;
 
 		my $goNext = 0;
 		# Check if VM exists in specific computer
-		open (my $computerExist, "powershell Get-VM -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.Name -eq '".$machine."'} | measure | % {\$_.Count} \" |");
+		open (my $computerExist, "powershell Get-VM -ComputerName ".$vmInfo[1]." -ErrorAction SilentlyContinue \"| Where-Object {\$_.Name -eq '".$vmInfo[0]."'} | measure | % {\$_.Count} \" |");
 		while (<$computerExist>)
 		{
 			if ($_ == 0)
 			{
-				print RED, "  ".$machine." on ".$computer." is not available for testing...\n", RESET;
+				print RED, "  ".$vmInfo[0]." on ".$vmInfo[1]." is not available for testing...\n", RESET;
 				$goNext = 1;
 			}
 		}
 		close($computerExist);
 		($goNext == 1) and next;
 		
-		open(my $computerResult, "powershell Get-VM -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} | measure | % {\$_.Count} \" |");
+		open(my $computerResult, "powershell Get-VM -ComputerName ".$vmInfo[1]." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} | measure | % {\$_.Count} \" |");
 		while (<$computerResult>)
 		{
 			if ($_ >= $_vmPerServer_)
 			{
-				print RED, "  ".$machine." on ".$computer." is working on other test case...\n", RESET;
+				print RED, "  ".$vmInfo[0]." on ".$vmInfo[1]." is working on other test case...\n", RESET;
 				push(@tasks, $task);
 			
 				sleep($_waitShort_);
@@ -280,23 +241,23 @@ sub dispatchTasks()
 			else
 			{
 				# If machine is not running, start it
-				open(my $vmResult, "powershell Get-VM -VMName ".$machine." -ComputerName ".$computer." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} \" |");
+				open(my $vmResult, "powershell Get-VM -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} \" |");
 				if (eof $vmResult)
 				{
-					print GREEN, "  ".$machine." is available.\n", RESET;
-					system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$machine." -ComputerName ".$computer." -Confirm:\$false");
+					print GREEN, "  ".$vmInfo[0]." is available.\n", RESET;
+					system("powershell Restore-VMSnapshot -Name ATReady -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]." -Confirm:\$false");
 					
 					# Temporarily add more resources
-					system("powershell Set-VMMemory -VMName ".$machine." -ComputerName ".$computer." -DynamicMemoryEnabled \$false -StartupBytes 4096MB");
-					system("powershell Set-VMProcessor -VMName ".$machine." -ComputerName ".$computer." -Count 4");
+					system("powershell Set-VMMemory -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]." -DynamicMemoryEnabled \$false -StartupBytes 4096MB");
+					system("powershell Set-VMProcessor -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]." -Count 4");
 					
-					system("powershell Start-VM -VMName ".$machine." -ComputerName ".$computer);
+					system("powershell Start-VM -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]);
 
-					push(@_runningMachines_, $machine);
+					push(@_runningMachines_, $vmInfo[0]);
 				}
 				else
 				{
-					print RED, "  ".$machine." is working on previous test case...\n", RESET;
+					print RED, "  ".$vmInfo[0]." is working on previous test case...\n", RESET;
 					push(@tasks, $task);
 					
 					sleep($_waitShort_);
@@ -322,6 +283,58 @@ sub getDateTime()
 							$min,
 							$sec );
 	print BRIGHT_MAGENTA, "  ========== ", BOLD BRIGHT_BLUE, "[$DateTime]: $_[0]\n", RESET;
+}
+
+sub getMatchingVM()
+{
+#	&getDateTime("getMatchingVM Start");
+	my $os = shift;
+	my $lcid = shift;
+	
+	my @result = ();
+
+	if ($os eq "Win10-64")
+	{
+		if ($lcid eq "0404") {@result = ("Win10-64-TW", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0407") {@result = ("Win10-64-DE", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0C0A") {@result = ("Win10-64-ES", "TPE-ATSERVER03");}
+		elsif ($lcid eq "040C") {@result = ("Win10-64-FR", "TPE-ATSERVER03");}
+		elsif ($lcid eq "040D") {@result = ("Win10-64-IL", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0410") {@result = ("Win10-64-IT", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0411") {@result = ("Win10-64-JP", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0413") {@result = ("Win10-64-NL", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0415") {@result = ("Win10-64-PL", "TPE-ATSERVER03");}
+		elsif ($lcid eq "0419") {@result = ("Win10-64-RU", "TPE-ATSERVER03");}
+		else {@result = ("Win10-64-EN", "TPE-ATSERVER03");}
+	}
+	elsif ($os eq "Win7-64")
+	{
+		if ($lcid eq "0404") {@result = ("Win7SP1-64-TW", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0407") {@result = ("Win7SP1-64-DE", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0409") {@result = ("Win7SP1-64-EN", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0C0A") {@result = ("Win7SP1-64-ES", "TPE-ATSERVER01");}
+		elsif ($lcid eq "040C") {@result = ("Win7SP1-64-FR", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0410") {@result = ("Win7SP1-64-IT", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0411") {@result = ("Win7SP1-64-JP", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0413") {@result = ("Win7SP1-64-NL", "TPE-ATSERVER01");}
+		elsif ($lcid eq "0419") {@result = ("Win7SP1-64-RU", "TPE-ATSERVER01");}
+		else {@result = ("Win10-64-EN", "TPE-ATSERVER01");}
+	}
+	elsif ($os eq "Win81-64")
+	{
+		if ($lcid eq "0404") {@result = ("Win81-64-TW", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0407") {@result = ("Win81-64-DE", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0409") {@result = ("Win81-64-EN", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0C0A") {@result = ("Win81-64-ES", "TPE-ATSERVER02");}
+		elsif ($lcid eq "040C") {@result = ("Win81-64-FR", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0410") {@result = ("Win81-64-IT", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0411") {@result = ("Win81-64-JP", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0413") {@result = ("Win81-64-NL", "TPE-ATSERVER02");}
+		elsif ($lcid eq "0419") {@result = ("Win81-64-RU", "TPE-ATSERVER02");}
+		else {@result = ("Win10-64-EN", "TPE-ATSERVER02");}
+	}	
+#	&getDateTime("getMatchingVM End");
+	return @result;
 }
 
 #
@@ -353,9 +366,19 @@ sub matchTasksWithResults()
 		
 			if (index($result, $substring) != -1)
 			{
-				$matchCount++;
-				print GREEN, "  Task result found: ", RESET, $result, "\n", RESET;
-				last;
+				# Make sure the machine is stopped, otherwise it's still writing.				
+				my @vmInfo = &getMatchingVM($task->{OS}, $task->{LCID});
+				open(my $vmResult, "powershell Get-VM -VMName ".$vmInfo[0]." -ComputerName ".$vmInfo[1]." -ErrorAction SilentlyContinue \"| Where-Object {\$_.State -eq 'Running'} \" |");
+				if (eof $vmResult)
+				{
+					$matchCount++;
+					print GREEN, "  Task result found: ", RESET, $result, "\n", RESET;
+					last;
+				}
+				else
+				{
+					print RED, "  ".$vmInfo[0]." on ".$vmInfo[1]." is working on other test case...\n", RESET;
+				}
 			}
 		}
 	}

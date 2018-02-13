@@ -12,7 +12,7 @@ Initialize
     ${LANG}    Get System Language
     Set Suite Variable    ${LANG}
 	${result} =    Run Keyword And Ignore Error    Should Match Regexp    ${LOGID}    ^\\d{6}$
-	Set Image Horizon Library    ${LANG}    ${LOGID}
+	Set Image Horizon Library    ${CLASS}    ${LANG}    ${LOGID}
 	${BUILD}    Set Variable If    '@{result}[0]' == 'PASS'    ${OPTIONS}_${VERSION}${VERSIONEXTENSION}_${CUSTOMER}_LOGID${LOGID}    ${LOGID}.exe
     Set Suite Variable    ${BUILD}
     ${SetupDir}    Get Setup Directory    ${CLASS}    OSbits=32bit
@@ -267,7 +267,7 @@ Process Page Features Settings
     Defocus
     Run Keyword If    '${ALIAS}' != 'TBYB-Breakdown' and '${ALIAS}' != 'SoftBank'    Run Keywords    Click Image    Checkbox languages
     ...    AND    Run Keyword If    '${Lang}' == '0409'    Select All Languages
-    Click Image    Page Features Settings
+    Click To The Below Of Image    Page Features Settings    150
     Press Shortcut Key    ${Lang}    Install Now
 
 Process Guided Tour
