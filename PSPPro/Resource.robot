@@ -12,12 +12,18 @@ Library           ImageHorizonLibrary    screenshot_folder=output    keyword_on_
 *** Variables ***
 ${DownloadDir}    C:\\Users\\ivibuild\\Downloads
 ${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
-&{SerialNumbers}    ProRetail=TS20R22-4EQLFW7-QNC5EVN-HTM2UW6
-    ...    ProTBYB=
-	...    ProVLP=TS20C22-A7X3V43-DAMUHWT-ZWZ9RSQ
-	...    BasicRetail=TB20R22-NBTK8WM-NJLVNZH-8DVAJRU
-	...    BasicTBYB=TB20T22-4MUX7PW-B3BGDBJ-XYMEQM2
-    ...    UltimateRetail=TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
+&{SerialNumbers}    PSPX10_ProRetail=TS20R22-4EQLFW7-QNC5EVN-HTM2UW6
+    ...    PSPX10_ProTBYB=
+	...    PSPX10_ProVLP=TS20C22-A7X3V43-DAMUHWT-ZWZ9RSQ
+	...    PSPX10_BasicRetail=TB20R22-NBTK8WM-NJLVNZH-8DVAJRU
+	...    PSPX10_BasicTBYB=TB20T22-4MUX7PW-B3BGDBJ-XYMEQM2
+    ...    PSPX10_UltimateRetail=TU20R22-9GR4R5S-KKVRD2G-MC6YNDJ
+    ...    PSPX11_ProRetail=TS21R22-D5Q4KR6-VBQNFM9-DJXXGWS
+    ...    PSPX11_ProTBYB=TS21T22-G8RF9WF-CLP5H3C-YWUAF5N
+    ...    PSPX11_UltimateRetail=TU21R22-MMG5QWZ-LQQPXWV-CG57GKA
+    ...    PSPX11_UltimateTBYB=TU21T22-ZZ9H64Q-M7THC2T-MD8WRW8
+    ...    PSPX11_BasicRetail=TB21R22-RG44AJL-TML5787-7DX6768
+    ...    PSPX11_BasicTBYB=TB21T22-ZA7WD5G-T5TJ42A-J7EYT38	
 ${Email}          buildrelease@corel.com
 @{Languages} =    0404    0407    0409    0C0A    040C    0410    0411    0413    0419
 ${en-US}          0409
@@ -45,6 +51,7 @@ ${BUILD}          \    # Build package name like "Main-Branch_20.0.0.132_PhotoUl
 Click Varied Image
     [Arguments]    ${reference_image}
 	:FOR    ${INDEX}    IN RANGE    1    6
+	\    Take A Screenshot	
 	\    ${variedName} =    Catenate    ${reference_image}    ${INDEX}
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${variedName}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Run Keywords    Click Image    ${variedName}    AND    Exit For Loop
@@ -101,14 +108,10 @@ Launch Onscreen Keyboard
 Press Shortcut Key
     [Documentation]    Maps keyboard shortcut key for different languages
 	[Arguments]    ${Lang}    ${Shortcut}
-	Run Keyword If    '${Lang}' == '0407' and '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.I
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.C
-	...    ELSE IF    '${Lang}' == '0410' and '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.S
-	...    ELSE IF    '${Lang}' == '0413' and '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.K
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Accept'    Click Image    Checkbox Accept EULA
+	Run Keyword If    '${Lang}' == '0419' and '${Shortcut}' == 'Accept'    Click Image    Checkbox Accept EULA
 	...    ELSE IF    '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.A
 	...    ELSE IF    '${Shortcut}' == 'Close'    Press Combination    Key.AltLeft    Key.F4
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Email'    Press Combination    Key.Tab
+	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Email'    Run Keywords    Press Combination    Key.Tab    AND    Press Combination    Key.Tab
 	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Email'    Click To The Below Of Varied Image    Editbox Email    24
 	...    ELSE IF    '${Lang}' == '0C0A' and '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.C
 	...    ELSE IF    '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.E
@@ -147,7 +150,7 @@ Set Image Horizon Library
 	...   ELSE    Catenate    ${imgLang}    Win10
 	${imgFolder} =    Catenate    ${Class}    ${imgLang}
     ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${imgFolder}
-    ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\${folder}
+    ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\_${folder}
 	
 Set System Fonts
     [Arguments]    ${Lang}
@@ -207,24 +210,24 @@ Set System Language Preferences
 Take Screenshot And Wait
     [Documentation]    Take the amount of screenshots while waiting, so that we can monitor the process.
 	[Arguments]    ${time}
-	${count} =    Evaluate    ${time} / 60
+	${count} =    Evaluate    ${time} / 20
     :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Take A Screenshot
-	\    Sleep    1m
+	\    Sleep    20s
 	
 Take Screenshot And Wait For
     [Documentation]    Take the amount of screenshots while waiting for specific image, so that we can monitor the process.
 	[Arguments]    ${reference_image}    ${timeout}
     Take A Screenshot
 	${result} =    Create List    ${0}    ${0}
-	${count} =    Evaluate    ${timeout} / 60
+	${count} =    Evaluate    ${timeout} / 20
     :FOR    ${INDEX}    IN RANGE    0    ${count}
-	\    Sleep    1m
 	\    Take A Screenshot	
 	\    ${hasImage} =    Run Keyword And Ignore Error    Does Exist    ${reference_image}
 	\    ${result} =    Run Keyword If    ${hasImage} == ('PASS', True)    Locate    ${reference_image}
 	\    ...    ELSE    Create List    ${0}    ${0}
 	\    Run Keyword If    ${hasImage} == ('PASS', True)    Exit For Loop	
+	\    Sleep    20s	
 	Run Keyword If    (@{result}[0] == ${0} and @{result}[1] == ${0})    Fail
 	[Return]    ${result}
 	
@@ -335,11 +338,12 @@ Type Onscreen Keyboard
 	
 Wait For Varied
     [Arguments]    ${reference_image}    ${timeout}
-	${count} =    Evaluate    ${timeout} / 60
+	Take A Screenshot
 	${result} =    Create List    FAIL    ${EMPTY}
+	${count} =    Evaluate    ${timeout} / 20
     :FOR    ${INDEX}    IN RANGE    0    ${count}
-	\    Sleep    1m
 	\    Take A Screenshot	
 	\    ${result} =    Does Varied Exist    ${reference_image}
 	\    Run Keyword If    '@{result}[0]' == 'PASS'    Exit For Loop
+	\    Sleep    20s
 	Run Keyword If    '@{result}[0]' == 'FAIL'    Fail

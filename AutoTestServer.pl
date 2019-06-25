@@ -39,14 +39,15 @@ sub main()
 {
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 	$_date_ = sprintf("%04d-%02d-%02d", $year + 1900, $mon + 1, $mday);
-	# Parse the server config file before we start
-	&parseConfig();
 
 	my @_files_;
 	while($_loop_)
 	{
+		# Parse the server config file before we start
+		&parseConfig();	
+	
 		# Check if new jobs exist
-		@_files_ = glob($_autoTestDir_."\\Jobs\\563524.py");
+		@_files_ = reverse(glob($_autoTestDir_."\\Jobs\\*.py"));
 		if (scalar @_files_ > 0)
 		{
 			# Make sure no VM is running
@@ -66,6 +67,7 @@ sub main()
 
 					if ($_LOGID_ ne "")
 					{
+						rmtree($_autoTestDir_."\\_".$_LOGID_);
 						rmtree($_autoTestDir_."\\".$_LOGID_);
 					}
 					
@@ -80,7 +82,7 @@ sub main()
 					elsif ($_STUB_ ne "")
 					{
 						push(@stubTasks, @tasks);
-						&waitResults("PSPX10_StubInstaller\\".$_date_, \@tasks, $_STUB_);						
+						&waitResults("StubInstaller\\".$_date_, \@tasks, $_STUB_);						
 					}
 					
 					# Shutdown the VMs.
@@ -104,10 +106,11 @@ sub main()
 					&collectResults("PSPX10_StubInstaller\\".$_date_, \@stubTasks);
 				}
 				
-				$_loop_ = 0;
+#				$_loop_ = 0;
 			}
 			else
 			{
+#			print $vmResult;
 				&getDateTime("Testing in progress");
 			}
 			close($vmResult);
@@ -131,8 +134,12 @@ sub collectResults()
 	my @tasks = @{my $t = shift};
 	
 	&waitResults($logID, \@tasks);
-	system("rebot --name ".$_BUILD_." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\".$logID."\\*.xml");
+	print YELLOW, " xcopy /I /E /Q /Y $_autoTestDir_\\_$logID $_autoTestDir_\\$logID \n", RESET;
+	open(my $copy, "xcopy /I /E /Q /Y $_autoTestDir_\\_$logID $_autoTestDir_\\$logID |");
+	close($copy);
+	system("rebot --name ".$_BUILD_." --outputdir ".$_autoTestDir_."\\".$logID." ".$_autoTestDir_."\\_".$logID."\\*.xml");
 	print CYAN, "  Test result created \n", RESET;
+	rmtree($_autoTestDir_."\\_".$logID);
 	&getDateTime("collectResults End");
 }
 
@@ -157,12 +164,12 @@ sub createClientBatchScript()
 	{
 		if ($_LOGID_ =~ /(\d+)/)
 		{
-			$outputDir = $_LOGID_;
+			$outputDir = "_".$_LOGID_;
 			$outputName = $task->{OS}."_".$task->{LCID}."_".$task->{TESTCASE};
 		}
 		else
 		{
-			$outputDir = "PSPX10_StubInstaller\\".$_date_;
+			$outputDir = "StubInstaller\\".$_date_;
 			$outputName = $task->{OS}."_".$task->{LCID}."_".$task->{TESTCASE}."_".$_STUB_;
 		}
 		
@@ -346,7 +353,7 @@ sub matchTasksWithResults()
 	my $logID = shift;
 	my @tasks = @{my $t = shift};
 	my $stub = shift;
-	my @results = glob($_autoTestDir_."\\".$logID."\\*.xml");	
+	my @results = glob($_autoTestDir_."\\_".$logID."\\*.xml");	
 	my $matchCount = 0;
 	my $substring = "";
 	

@@ -13,8 +13,8 @@
       ]
     },
     {
-      "CLASS": "PSPX10",
-      "CUSTOMER": "PhotoUlt(QA)-Retail(Release)",
+      "CLASS": "PSPX0",
+      "CUSTOMER": "PhotoPro(QA)-Retail(Release)",
       "OPTIONS": "Main-Branch",
       "TASK": [
         {
@@ -120,60 +120,6 @@
           "TESTCASE": "FirstLaunch64bit"
         },
         {
-          "LCID": "0411",
-          "OS": "Win81-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0413",
-          "OS": "Win81-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0419",
-          "OS": "Win81-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0409",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",
-          "TESTCASE": "FirstLaunch32bit"
-        },
-        {
-          "LCID": "0409",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0404",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0407",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "0C0A",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
-          "LCID": "040C",
-          "OS": "Win10-64",
-		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
-          "TESTCASE": "FirstLaunch64bit"
-        },
-        {
           "LCID": "0410",
           "OS": "Win10-64",
 		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
@@ -181,7 +127,31 @@
         },
         {
           "LCID": "0411",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
           "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0413",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0413",
+          "OS": "Win81-64",
 		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
           "TESTCASE": "FirstLaunch64bit"
         },
@@ -193,6 +163,36 @@
         },
         {
           "LCID": "0419",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0419",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0419",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
           "OS": "Win10-64",
 		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
           "TESTCASE": "FirstLaunch64bit"
@@ -205,6 +205,342 @@
         },
         {
           "LCID": "040D",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoBasic(QA)-Retail(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-PF(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-PF(Release-SoftBank)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+    {
+      "CLASS": "PSPX11",
+      "CUSTOMER": "PhotoPro(QA)-Retail(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",
+          "TESTCASE": "FirstLaunch32bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",
+          "TESTCASE": "FirstLaunch32bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",
+          "TESTCASE": "FirstLaunch32bit"
+        },
+        {
+          "LCID": "0404",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0404",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0404",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0407",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0407",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0407",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0C0A",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0C0A",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0C0A",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "040C",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "040C",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "040C",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0410",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0410",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0410",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0411",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0413",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0413",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0413",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0419",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0419",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0419",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win7-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win81-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "0415",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        },
+        {
+          "LCID": "040D",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-RoyaltyFree(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-TBYB(Release-30Day)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },		
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-TBYB(Release-30Day-SoftBank)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch32bit"
+        },
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }		
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-TBYB(Release-30Day-SoftBank-x86)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch32bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoPro(QA)-TBYB(Release-30Day-SoftBank-x64)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoUlt(QA)-PF(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },		
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoUlt(QA)-PF(Release-SoftBank)",
+      "TASK": [
+        {
+          "LCID": "0409",
+          "OS": "Win10-64",
+		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
+          "TESTCASE": "FirstLaunch64bit"
+        }
+      ]
+    },	
+	{
+      "CLASS": "PSPX11",
+	  "CUSTOMER": "PhotoUtl(QA)-Retail(Release)",
+      "TASK": [
+        {
+          "LCID": "0409",
           "OS": "Win10-64",
 		  "PROJECT": "\\Tools-AutoTest\\PSPPro\\TestSuites\\AcceptanceTest.robot",		  
           "TESTCASE": "FirstLaunch64bit"
