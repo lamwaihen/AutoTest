@@ -11,7 +11,7 @@ Library           ImageHorizonLibrary    screenshot_folder=output    keyword_on_
 
 *** Variables ***
 ${DownloadDir}    C:\\Users\\ivibuild\\Downloads
-${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
+${BuildsDir}      \\\\tpe-itnas\\rd\\builds
 &{SerialNumbers}    PSPX10_ProRetail=TS20R22-4EQLFW7-QNC5EVN-HTM2UW6
     ...    PSPX10_ProTBYB=
 	...    PSPX10_ProVLP=TS20C22-A7X3V43-DAMUHWT-ZWZ9RSQ
@@ -24,8 +24,8 @@ ${BuildsDir}      \\\\corelcorp.corel.ics\\rd\\builds
     ...    PSPX11_UltimateTBYB=TU21T22-ZZ9H64Q-M7THC2T-MD8WRW8
     ...    PSPX11_BasicRetail=TB21R22-RG44AJL-TML5787-7DX6768
     ...    PSPX11_BasicTBYB=TB21T22-ZA7WD5G-T5TJ42A-J7EYT38	
-${Email}          buildrelease@corel.com
-@{Languages} =    0404    0407    0409    0C0A    040C    0410    0411    0413    0419
+${EMAIL}          buildrelease@corel.com
+@{Languages} =    0409
 ${en-US}          0409
 ${zh-TW}          0404
 ${de-DE}          0407
@@ -48,6 +48,28 @@ ${VERSION}        \    # Arguments from BM2, e.g. "20.0.0.132"
 ${BUILD}          \    # Build package name like "Main-Branch_20.0.0.132_PhotoUlt(QA)-Retail(Release)_LOGID563524"
 
 *** Keywords ***
+Click Button
+    [Arguments]    ${buttonName}
+    @{posButton}    Run Keyword If    '${buttonName}' == 'Browser-Close'    Get Browser-Close Pos
+    ...    ELSE IF    '${buttonName}' == 'GuidedTour-Next'    Get GuidedTour-Next Pos
+	...    ELSE IF    '${buttonName}' == 'Mode-Home' or '${buttonName}' == 'Mode-EssentialsEdit' or '${buttonName}' == 'Mode-CompleteManage' or '${buttonName}' == 'Mode-PhotographyEdit' or '${buttonName}' == 'Mode-CompleteEdit'    Get Modes Pos    ${buttonName}
+    ...    ELSE IF    '${buttonName}' == 'Photography-TouchFriendly'    Get Photography-TouchFriendly Pos
+    ...    ELSE IF    '${buttonName}' == 'Register'    Get Register Pos
+    ...    ELSE IF    '${buttonName}' == 'Register-Continue'    Get Register-Continue Pos
+    ...    ELSE IF    '${buttonName}' == 'Register-Email'    Get Register-Email Pos
+    ...    ELSE IF    '${buttonName}' == 'Setup-Accept'    Get Setup-Accept Pos
+    ...    ELSE IF    '${buttonName}' == 'Setup-CheckUpdates'    Get Setup-CheckUpdates Pos
+    ...    ELSE IF    '${buttonName}' == 'Setup-Languages'    Get Setup-Languages Pos
+    ...    ELSE IF    '${buttonName}' == 'Setup-Next'    Get Setup-Next Pos
+    ...    ELSE IF    '${buttonName}' == 'Setup-OptionBoth' or '${buttonName}' == 'Setup-Option32bit' or '${buttonName}' == 'Setup-Option64bit'    Get Setup-Options Pos    ${buttonName}
+    ...    ELSE IF    '${buttonName}' == 'Setup-Serial'    Get Setup-Serial Pos
+    ...    ELSE IF    '${buttonName}' == 'Welcome-GetStarted'    Get Welcome-GetStarted Pos
+    ...    ELSE IF    '${buttonName}' == 'Welcome-WorkspaceEssentials' or '${buttonName}' == 'Welcome-WorkspaceComplete' or '${buttonName}' == 'Welcome-WorkspacePhotography'    Get Welcome-Workspaces Pos    ${buttonName}
+    ...    ELSE    Fail    Unknown button name
+	Move To    ${posButton}
+    Click
+	Sleep    2s
+	
 Click Varied Image
     [Arguments]    ${reference_image}
 	:FOR    ${INDEX}    IN RANGE    1    6
@@ -107,48 +129,47 @@ Launch Onscreen Keyboard
 	
 Press Shortcut Key
     [Documentation]    Maps keyboard shortcut key for different languages
-	[Arguments]    ${Lang}    ${Shortcut}
-	Run Keyword If    '${Lang}' == '0419' and '${Shortcut}' == 'Accept'    Click Image    Checkbox Accept EULA
+	[Arguments]    ${Shortcut}
+	Run Keyword If    '${LANG}' == '0419' and '${Shortcut}' == 'Accept'    Click Image    Checkbox Accept EULA
 	...    ELSE IF    '${Shortcut}' == 'Accept'    Press Combination    Key.AltLeft    Key.A
 	...    ELSE IF    '${Shortcut}' == 'Close'    Press Combination    Key.AltLeft    Key.F4
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Email'    Run Keywords    Press Combination    Key.Tab    AND    Press Combination    Key.Tab
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Email'    Click To The Below Of Varied Image    Editbox Email    24
-	...    ELSE IF    '${Lang}' == '0C0A' and '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.C
+	...    ELSE IF    '${LANG}' == '040C' and '${Shortcut}' == 'Email'    Run Keywords    Press Combination    Key.Tab    AND    Press Combination    Key.Tab
+	...    ELSE IF    '${LANG}' == '0419' and '${Shortcut}' == 'Email'    Click To The Below Of Varied Image    Editbox Email    24
+	...    ELSE IF    '${LANG}' == '0C0A' and '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.C
 	...    ELSE IF    '${Shortcut}' == 'Email'    Press Combination    Key.AltLeft    Key.E
-	...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.B
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.T
-	...    ELSE IF    '${Lang}' == '0413' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.V
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Finish'    Click Varied Image    Button Finish
+	...    ELSE IF    '${LANG}' == '0407' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.B
+	...    ELSE IF    '${LANG}' == '040C' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.T
+	...    ELSE IF    '${LANG}' == '0413' and '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.V
+	...    ELSE IF    '${LANG}' == '0419' and '${Shortcut}' == 'Finish'    Click Varied Image    Button Finish
 	...    ELSE IF    '${Shortcut}' == 'Finish'    Press Combination    Key.AltLeft    Key.F
-    ...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Install Now'    Press Combination    Key.AltLeft    Key.J
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Install Now'    Click Varied Image    Button Install Now
+    ...    ELSE IF    '${LANG}' == '0407' and '${Shortcut}' == 'Install Now'    Press Combination    Key.AltLeft    Key.J
+	...    ELSE IF    '${LANG}' == '0419' and '${Shortcut}' == 'Install Now'    Click Varied Image    Button Install Now
 	...    ELSE IF    '${Shortcut}' == 'Install Now'    Press Combination    Key.AltLeft    Key.I
-	...    ELSE IF    '${Lang}' == '0407' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.W	
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.S
-	...    ELSE IF    '${Lang}' == '0410' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.C
-	...    ELSE IF    '${Lang}' == '0413' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.V
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Next'    Click Varied Image    Button Next
-	...    ELSE IF    '${Lang}' == '0C0A' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.S
+	...    ELSE IF    '${LANG}' == '0407' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.W	
+	...    ELSE IF    '${LANG}' == '040C' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.S
+	...    ELSE IF    '${LANG}' == '0410' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.C
+	...    ELSE IF    '${LANG}' == '0413' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.V
+	...    ELSE IF    '${LANG}' == '0419' and '${Shortcut}' == 'Next'    Click Varied Image    Button Next
+	...    ELSE IF    '${LANG}' == '0C0A' and '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.S
 	...    ELSE IF    '${Shortcut}' == 'Next'    Press Combination    Key.AltLeft    Key.N
-	...    ELSE IF    '${Lang}' == '040C' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.M
-	...    ELSE IF    '${Lang}' == '0410' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.N
-	...    ELSE IF    '${Lang}' == '0419' and '${Shortcut}' == 'Serial Number'    Click To The Below Of Image    Editbox Serial Number    24
-	...    ELSE IF    '${Lang}' == '0C0A' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.M	
+	...    ELSE IF    '${LANG}' == '040C' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.M
+	...    ELSE IF    '${LANG}' == '0410' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.N
+	...    ELSE IF    '${LANG}' == '0419' and '${Shortcut}' == 'Serial Number'    Click To The Below Of Image    Editbox Serial Number    24
+	...    ELSE IF    '${LANG}' == '0C0A' and '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.M	
 	...    ELSE IF    '${Shortcut}' == 'Serial Number'    Press Combination    Key.AltLeft    Key.S
 	...    ELSE    Fail    Unknown shortcut key
 	
 Set Image Horizon Library
-    [Arguments]    ${Class}    ${Lang}    ${LogID}
+    [Arguments]    ${LogID}
 	${date} =    Get Current Date    UTC    8h    %Y-%m-%d
-	${stubfolder} =    Catenate    SEPARATOR=\\    PSPX10_StubInstaller    ${date}
+	${stubfolder} =    Catenate    SEPARATOR=\\    StubInstaller    ${date}
 	${result} =    Run Keyword And Ignore Error    Should Match Regexp    ${LOGID}    ^\\d{6}$
 	${folder} =    Set Variable If    '@{result}[0]' == 'PASS'    ${LogID}    ${stubfolder}	
-	${result} =    Run Keyword And Return Status    List Should Contain Value    ${Languages}    ${Lang}
-	${imgLang} =    Set Variable If    '${result}' == 'True'    ${Lang}    0409
-	${imgLang} =    Run Keyword If    '${OS}' == '6.1'    Catenate    ${imgLang}    Win7
+	${result} =    Run Keyword And Return Status    List Should Contain Value    ${Languages}    ${LANG}
+	${imgLang} =    Set Variable If    '${result}' == 'True'    ${LANG}    0409
+	${imgFolder} =    Run Keyword If    '${OS}' == '6.1'    Win7
 	...   ELSE IF    '${OS}' == '6.3'    Catenate    ${imgLang}    Win8
 	...   ELSE    Catenate    ${imgLang}    Win10
-	${imgFolder} =    Catenate    ${Class}    ${imgLang}
     ImageHorizonLibrary.Set Reference Folder    ${CURDIR}\\Images\\${imgFolder}
     ImageHorizonLibrary.Set Screenshot Folder    ${CURDIR}\\..\\..\\_${folder}
 	
@@ -210,10 +231,10 @@ Set System Language Preferences
 Take Screenshot And Wait
     [Documentation]    Take the amount of screenshots while waiting, so that we can monitor the process.
 	[Arguments]    ${time}
-	${count} =    Evaluate    ${time} / 20
+	${count} =    Evaluate    ${time} / 30
     :FOR    ${INDEX}    IN RANGE    0    ${count}
 	\    Take A Screenshot
-	\    Sleep    20s
+	\    Sleep    30s
 	
 Take Screenshot And Wait For
     [Documentation]    Take the amount of screenshots while waiting for specific image, so that we can monitor the process.
@@ -232,7 +253,7 @@ Take Screenshot And Wait For
 	[Return]    ${result}
 	
 Type Keyboard
-    [Arguments]    ${Lang}    ${Input}
+    [Arguments]    ${Input}
 	@{characters} =	   Split String To Characters    ${Input}
     Take A Screenshot
 	:FOR    ${char}    IN     @{characters}
@@ -298,16 +319,18 @@ Type Keyboard
 	\    ...    ELSE IF    '${char}' == '7'    Press Combination    Key.7
 	\    ...    ELSE IF    '${char}' == '8'    Press Combination    Key.8
 	\    ...    ELSE IF    '${char}' == '9'    Press Combination    Key.9
-	\    ...    ELSE IF    '${Lang}' == '0407' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '040C' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0410' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0411' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0413' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0419' and '${char}' == '@'    Press Combination    Key.@
-	\    ...    ELSE IF    '${Lang}' == '0C0A' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0407' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '040C' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0410' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0411' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0413' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0419' and '${char}' == '@'    Press Combination    Key.@
+	\    ...    ELSE IF    '${LANG}' == '0C0A' and '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${char}' == '@'    Press Combination    Key.@
 	\    ...    ELSE IF    '${char}' == '.'    Press Combination    Key..
 	\    ...    ELSE IF    '${char}' == '-'    Press Combination    Key.-
+	Sleep    2s
+    Take A Screenshot	
 	
 Type Onscreen Keyboard
     [Documentation]    Helper function to type onscreen keyboard in Japanese OS, close after completed.
